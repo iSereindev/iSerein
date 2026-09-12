@@ -61,10 +61,13 @@ export default async function ReadingPage({
     topicStyles[article.topic as keyof typeof topicStyles] ??
     topicStyles.Life;
 
-  const paragraphs = article.content
+  const content: string =
+    typeof article.content === "string" ? article.content : "";
+
+  const paragraphs: string[] = content
     .split("\n\n")
     .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
+    .filter((paragraph) => paragraph.length > 0);
 
   const { data: previousArticle } = await supabase
     .from("articles")
@@ -84,7 +87,6 @@ export default async function ReadingPage({
 
   return (
     <main className="min-h-screen bg-[#FFF7F0] text-[#44313D]">
-
       {/* Top navigation */}
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 md:px-10 md:py-8">
         <a
@@ -99,10 +101,8 @@ export default async function ReadingPage({
 
       {/* Reading area */}
       <article className="mx-auto max-w-5xl px-5 pb-16 md:px-8 md:pb-24">
-
         {/* Book page */}
         <div className="relative overflow-hidden rounded-[2rem] bg-[#FFFCF8] shadow-[0_25px_80px_rgba(68,49,61,0.10)]">
-
           {/* Soft decorative colour */}
           <div
             className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full blur-3xl"
@@ -122,7 +122,6 @@ export default async function ReadingPage({
           <div className="pointer-events-none absolute inset-4 rounded-[1.5rem] border border-[#44313D]/[0.07] md:inset-7" />
 
           <div className="relative px-7 py-12 md:px-16 md:py-16 lg:px-24 lg:py-20">
-
             {/* Top metadata */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -146,7 +145,6 @@ export default async function ReadingPage({
 
             {/* Opening */}
             <header className="mx-auto max-w-4xl pt-20 text-center md:pt-28">
-
               <div
                 className="mx-auto mb-8 flex h-11 w-11 items-center justify-center rounded-full"
                 style={{
@@ -168,24 +166,29 @@ export default async function ReadingPage({
               <div className="mx-auto mt-10 flex items-center justify-center gap-3">
                 <span
                   className="h-px w-10"
-                  style={{ backgroundColor: `${topic.accent}70` }}
+                  style={{
+                    backgroundColor: `${topic.accent}70`,
+                  }}
                 />
 
                 <span
                   className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: topic.accent }}
+                  style={{
+                    backgroundColor: topic.accent,
+                  }}
                 />
 
                 <span
                   className="h-px w-10"
-                  style={{ backgroundColor: `${topic.accent}70` }}
+                  style={{
+                    backgroundColor: `${topic.accent}70`,
+                  }}
                 />
               </div>
             </header>
 
             {/* Article */}
             <section className="mx-auto mt-20 max-w-2xl md:mt-28">
-
               {paragraphs.map((paragraph, index) => (
                 <p
                   key={index}
@@ -202,18 +205,17 @@ export default async function ReadingPage({
                   {paragraph}
                 </p>
               ))}
-
             </section>
 
             {/* Closing */}
             <div className="mx-auto mt-20 max-w-2xl border-t border-[#44313D]/10 pt-10 md:mt-24">
-
               <div className="flex flex-col items-center text-center">
-
                 <div className="flex items-center gap-4">
                   <span
                     className="h-px w-12"
-                    style={{ backgroundColor: `${topic.accent}70` }}
+                    style={{
+                      backgroundColor: `${topic.accent}70`,
+                    }}
                   />
 
                   <span
@@ -225,21 +227,20 @@ export default async function ReadingPage({
 
                   <span
                     className="h-px w-12"
-                    style={{ backgroundColor: `${topic.accent}70` }}
+                    style={{
+                      backgroundColor: `${topic.accent}70`,
+                    }}
                   />
                 </div>
 
                 <p className="mt-6 text-xs uppercase tracking-[0.3em] text-[#8B7A70]">
                   End of today&apos;s reading
                 </p>
-
               </div>
-
             </div>
 
             {/* Previous / Next */}
             <div className="mx-auto mt-16 grid max-w-3xl gap-4 border-t border-[#44313D]/10 pt-8 md:grid-cols-2">
-
               {previousArticle ? (
                 <PageTurnLink
                   href={`/reading/${previousArticle.id}`}
@@ -287,7 +288,6 @@ export default async function ReadingPage({
               ) : (
                 <div />
               )}
-
             </div>
 
             {/* Back to topic */}
@@ -299,7 +299,6 @@ export default async function ReadingPage({
                 ← Back to {article.topic}
               </a>
             </div>
-
           </div>
         </div>
       </article>
