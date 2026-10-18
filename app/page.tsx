@@ -28,10 +28,13 @@ export default function Home() {
           <nav className="iserein-home-header-nav" aria-label="Homepage navigation">
             <Link href="/topics">Topics</Link>
             <Link href="/explore">Explore</Link>
+            <Link href="/profile" className="iserein-home-collection">
+              Your collection <span aria-hidden="true">↗</span>
+            </Link>
           </nav>
 
-          <Link href="/profile" className="iserein-home-collection">
-            Your collection <span aria-hidden="true">↗</span>
+          <Link href="/install" className="iserein-primary iserein-home-install iserein-install-link">
+            Install iSEREIN <span aria-hidden="true">↓</span>
           </Link>
         </div>
       </header>
@@ -116,9 +119,6 @@ export default function Home() {
 
       <footer className="iserein-home-footer iserein-home-container">
         <p>Read slowly. Live deeply.</p>
-        <Link href="/install" className="iserein-home-text-link iserein-install-link">
-          Install iSEREIN <span aria-hidden="true">↗</span>
-        </Link>
         <span className="iserein-footer-brand">iSEREIN</span>
       </footer>
     </main>

@@ -192,6 +192,16 @@ h3 {
   white-space: nowrap;
 }
 
+.iserein-home-install {
+  min-height: 44px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .iserein-home-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
