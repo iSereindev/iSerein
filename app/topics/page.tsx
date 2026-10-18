@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTopicTheme } from "@/lib/reading-theme";
 
 const topics = [
   {
@@ -6,37 +7,34 @@ const topics = [
     description: "Mind, emotions, identity & confidence",
     introduction: "A little space to understand yourself.",
     href: "/topics/Self",
-    color: "#6B2636",
-    background: "#F1E4E7",
+    theme: getTopicTheme("Self"),
   },
   {
     name: "Life",
     description: "Love, relationships, work & meaning",
     introduction: "Thoughtful pages for being human.",
     href: "/topics/Life",
-    color: "#173A70",
-    background: "#E5EBF4",
+    theme: getTopicTheme("Life"),
   },
   {
     name: "Growth",
     description: "Courage, habits, learning & resilience",
     introduction: "Small steps toward who you are becoming.",
     href: "/topics/Growth",
-    color: "#0D3B33",
-    background: "#E3ECE8",
+    theme: getTopicTheme("Growth"),
   },
 ];
 
 export default function TopicsPage() {
   return (
-    <main className="min-h-screen bg-[#E8EEF4] text-[#44313D]">
-      <header className="border-b border-[#44313D]/10">
+    <main className="min-h-screen bg-[#F6F0E8] text-[#33241D]">
+      <header className="border-b border-[#33241D]/10">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
           <Link href="/" className="iserein-brand text-xl">
             iSEREIN
           </Link>
 
-          <span className="text-xs uppercase tracking-[0.2em] text-[#5F6975]">
+          <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">
             The collection
           </span>
         </div>
@@ -45,9 +43,9 @@ export default function TopicsPage() {
       <section className="px-6 pb-12 pt-14 md:px-10 md:pb-16 md:pt-24">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center gap-4">
-            <span className="h-px w-12 bg-[#C6A96B]" />
+            <span className="h-px w-12 bg-[#A7784D]" />
 
-            <p className="text-xs font-medium uppercase tracking-[0.28em] text-[#7F6A39]">
+            <p className="text-xs font-medium uppercase tracking-[0.28em] text-[#8C5F42]">
               A page for every part of you
             </p>
           </div>
@@ -56,7 +54,7 @@ export default function TopicsPage() {
             Topics
           </h1>
 
-          <p className="mt-6 max-w-xl font-serif text-lg leading-8 text-[#5F6975] md:text-xl">
+          <p className="mt-6 max-w-xl font-serif text-lg leading-8 text-[#75665C] md:text-xl">
             Begin wherever you are today. Choose a topic and discover
             a page to spend a little time with.
           </p>
@@ -72,18 +70,18 @@ export default function TopicsPage() {
             <Link
               key={topic.name}
               href={topic.href}
-              className="group flex flex-col overflow-hidden rounded-[1.75rem] border border-[#44313D]/10 bg-[#F7F8F9] shadow-[0_12px_35px_rgba(68,49,61,0.05)] transition-shadow hover:shadow-[0_20px_50px_rgba(68,49,61,0.12)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7F6A39]"
+              className="group flex flex-col overflow-hidden rounded-[1.75rem] border border-[#33241D]/10 bg-[#FFFDF9] shadow-[0_8px_28px_rgba(51,36,29,0.045)] transition-shadow hover:shadow-[0_14px_36px_rgba(51,36,29,0.09)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8C5F42]"
             >
               <div
-                className="relative flex min-h-[190px] flex-col justify-between p-8 text-[#FFF7F0]"
-                style={{ backgroundColor: topic.color }}
+                className="relative flex min-h-[190px] flex-col justify-between p-8 text-[#33241D]"
+                style={{ backgroundColor: topic.theme.surface }}
               >
                 <div
                   aria-hidden="true"
-                  className="pointer-events-none absolute inset-3 rounded-[1.1rem] border border-[#D7C28A]/35"
+                  className="pointer-events-none absolute inset-3 rounded-[1.1rem] border border-[#33241D]/15"
                 />
 
-                <span className="relative text-xs tracking-[0.2em] text-[#EAD5A6]">
+                <span className="relative text-xs tracking-[0.2em] text-[#33241D]">
                   CHAPTER {String(index + 1).padStart(2, "0")}
                 </span>
 
@@ -93,11 +91,11 @@ export default function TopicsPage() {
               </div>
 
               <div className="flex flex-1 flex-col p-7 md:p-8">
-                <p className="font-serif text-xl leading-8 text-[#44313D]">
+                <p className="font-serif text-xl leading-8 text-[#33241D]">
                   {topic.introduction}
                 </p>
 
-                <p className="mt-4 text-sm leading-7 text-[#5F6975]">
+                <p className="mt-4 text-sm leading-7 text-[#75665C]">
                   {topic.description}
                 </p>
 
@@ -105,8 +103,8 @@ export default function TopicsPage() {
                   <span
                     className="inline-flex items-center gap-3 rounded-full px-5 py-3 text-sm font-medium"
                     style={{
-                      color: topic.color,
-                      backgroundColor: topic.background,
+                      color: topic.theme.accent,
+                      backgroundColor: topic.theme.soft,
                     }}
                   >
                     Explore {topic.name}
@@ -119,8 +117,8 @@ export default function TopicsPage() {
         </div>
       </section>
 
-      <footer className="border-t border-[#44313D]/10 px-6 py-12 text-center">
-        <p className="font-serif text-xl italic text-[#5F6975]">
+      <footer className="border-t border-[#33241D]/10 px-6 py-12 text-center">
+        <p className="font-serif text-xl italic text-[#75665C]">
           Different chapters. One meaningful life.
         </p>
 

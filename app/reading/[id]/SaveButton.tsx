@@ -105,7 +105,7 @@ export default function SaveButton({
           ? "Remove from saved readings"
           : "Save this reading"
       }
-      className="rounded-full border border-[#cbdde1] px-5 py-3 text-sm text-[#58727a] transition hover:bg-white"
+      className="iserein-save-button rounded-full px-5 py-3 text-sm font-medium"
     >
       {saved ? "♥ Saved" : "♡ Save"}
     </button>

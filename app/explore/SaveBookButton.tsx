@@ -103,14 +103,14 @@ export default function SaveBookButton({
             ? "Remove this book from saved books"
             : "Save this book"
         }
-        className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full border border-[#44313D]/20 px-5 py-3 text-sm font-medium text-[#44313D] transition-colors hover:bg-[#E8EEF4] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#7F6A39] disabled:cursor-wait disabled:opacity-50"
+        className="iserein-save-button rounded-full px-5 py-3 text-sm font-medium disabled:cursor-wait disabled:opacity-50"
       >
         <span aria-hidden="true">{saved ? "♥" : "♡"}</span>
         {saved ? "Saved book" : "Save book"}
       </button>
 
       {error && (
-        <p role="alert" className="mt-2 text-sm leading-6 text-[#6B2636]">
+        <p role="alert" className="mt-2 text-sm leading-6 text-[#75665C]">
           {error}
         </p>
       )}

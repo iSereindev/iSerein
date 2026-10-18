@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -18,9 +19,9 @@ export default async function ReadingIndexPage() {
 
   if (!article) {
     return (
-      <main className="min-h-screen bg-[#eef5f7] text-[#29434c]">
+      <main className="min-h-screen bg-[#F6F0E8] text-[#33241D]">
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
-          <p className="text-sm uppercase tracking-[0.18em] text-[#78929b]">
+          <p className="text-sm uppercase tracking-[0.18em] text-[#8C5F42]">
             iSEREIN
           </p>
 
@@ -28,12 +29,12 @@ export default async function ReadingIndexPage() {
             No reading is published yet.
           </h1>
 
-          <a
+          <Link
             href="/"
-            className="mt-8 inline-block text-[#416d7b]"
+            className="mt-8 inline-block text-[#6B6157]"
           >
             Back to home
-          </a>
+          </Link>
         </div>
       </main>
     );

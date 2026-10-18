@@ -1,21 +1,8 @@
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getTopicTheme } from "@/lib/reading-theme";
 import SaveButton from "./SaveButton";
 import PageTurnLink from "./PageTurnLink";
-
-const topicStyles = {
-  Self: {
-    accent: "#C9787F",
-    soft: "#F4E2E0",
-  },
-  Life: {
-    accent: "#7E91B5",
-    soft: "#E4EAF2",
-  },
-  Growth: {
-    accent: "#8FA58A",
-    soft: "#E5ECE2",
-  },
-};
 
 export default async function ReadingPage({
   params,
@@ -38,8 +25,8 @@ export default async function ReadingPage({
 
   if (!article) {
     return (
-      <main className="min-h-screen bg-[#FFF7F0] px-6 py-24 text-center text-[#44313D]">
-        <p className="text-xs uppercase tracking-[0.3em] text-[#D9828B]">
+      <main className="min-h-screen bg-[#FFF9F0] px-6 py-24 text-center text-[#33241D]">
+        <p className="text-xs uppercase tracking-[0.3em] text-[#805334]">
           iSEREIN
         </p>
 
@@ -47,19 +34,17 @@ export default async function ReadingPage({
           This reading could not be found.
         </h1>
 
-        <a
+        <Link
           href="/"
-          className="mt-8 inline-block text-sm text-[#D9828B] transition hover:opacity-70"
+          className="mt-8 inline-block text-sm text-[#805334] transition hover:opacity-70"
         >
           Return home
-        </a>
+        </Link>
       </main>
     );
   }
 
-  const topic =
-    topicStyles[article.topic as keyof typeof topicStyles] ??
-    topicStyles.Life;
+  const topic = getTopicTheme(article.topic);
 
   const content: string =
     typeof article.content === "string" ? article.content : "";
@@ -86,23 +71,23 @@ export default async function ReadingPage({
     .maybeSingle();
 
   return (
-    <main className="min-h-screen bg-[#FFF7F0] text-[#44313D]">
+    <main className="min-h-screen bg-[#FFF9F0] text-[#33241D]">
       {/* Top navigation */}
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6 md:px-10 md:py-8">
-        <a
+        <Link
           href="/"
-          className="font-serif text-lg text-[#44313D] transition hover:text-[#D9828B]"
+          className="iserein-brand text-lg"
         >
           iSEREIN
-        </a>
+        </Link>
 
         <SaveButton articleId={article.id} />
       </div>
 
       {/* Reading area */}
-      <article className="mx-auto max-w-5xl px-5 pb-16 md:px-8 md:pb-24">
+      <article className="mx-auto max-w-5xl px-4 pb-16 md:px-8 md:pb-24">
         {/* Book page */}
-        <div className="relative overflow-hidden rounded-[2rem] bg-[#FFFCF8] shadow-[0_25px_80px_rgba(68,49,61,0.10)]">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[#FFFCF8] shadow-[0_16px_52px_rgba(51,36,29,0.065)]">
           {/* Soft decorative colour */}
           <div
             className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full blur-3xl"
@@ -119,9 +104,9 @@ export default async function ReadingPage({
           />
 
           {/* Subtle book border */}
-          <div className="pointer-events-none absolute inset-4 rounded-[1.5rem] border border-[#44313D]/[0.07] md:inset-7" />
+          <div className="pointer-events-none absolute inset-4 rounded-[1.5rem] border border-[#33241D]/[0.07] md:inset-7" />
 
-          <div className="relative px-7 py-12 md:px-16 md:py-16 lg:px-24 lg:py-20">
+          <div className="relative px-6 py-12 sm:px-10 md:px-16 md:py-16 lg:px-24 lg:py-20">
             {/* Top metadata */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -138,7 +123,7 @@ export default async function ReadingPage({
                 </span>
               </div>
 
-              <span className="text-xs uppercase tracking-[0.18em] text-[#9B8D87]">
+              <span className="text-xs uppercase tracking-[0.18em] text-[#75665C]">
                 {article.reading_time} min
               </span>
             </div>
@@ -155,11 +140,11 @@ export default async function ReadingPage({
                 <span className="font-serif text-lg">✦</span>
               </div>
 
-              <h1 className="font-serif text-4xl font-normal leading-[1.12] tracking-[-0.025em] text-[#44313D] md:text-6xl lg:text-7xl">
+              <h1 className="font-serif text-4xl font-normal leading-[1.12] tracking-[-0.025em] text-[#33241D] md:text-6xl lg:text-7xl">
                 {article.title}
               </h1>
 
-              <p className="mx-auto mt-7 max-w-2xl font-serif text-lg leading-8 text-[#75686F] md:text-xl md:leading-9">
+              <p className="mx-auto mt-7 max-w-2xl font-serif text-lg leading-8 text-[#6B5D54] md:text-xl md:leading-9">
                 {article.subtitle}
               </p>
 
@@ -188,13 +173,13 @@ export default async function ReadingPage({
             </header>
 
             {/* Article */}
-            <section className="mx-auto mt-20 max-w-2xl md:mt-28">
+            <section className="iserein-reading-copy mx-auto mt-20 max-w-2xl md:mt-28">
               {paragraphs.map((paragraph, index) => (
                 <p
                   key={index}
-                  className={`font-serif text-[1.08rem] leading-[2] text-[#4E444A] md:text-[1.17rem] md:leading-[2.05] ${
+                  className={`font-serif text-[1.08rem] leading-[2] text-[#4B4038] md:text-[1.17rem] md:leading-[2.05] ${
                     index === 0
-                      ? "first-letter:float-left first-letter:mr-3 first-letter:mt-2 first-letter:font-serif first-letter:text-7xl first-letter:font-normal first-letter:leading-[0.75] first-letter:text-[#D9828B]"
+                      ? "first-letter:float-left first-letter:mr-3 first-letter:mt-2 first-letter:font-serif first-letter:text-7xl first-letter:font-normal first-letter:leading-[0.75] first-letter:text-[#805334]"
                       : ""
                   } ${
                     index < paragraphs.length - 1
@@ -208,7 +193,7 @@ export default async function ReadingPage({
             </section>
 
             {/* Closing */}
-            <div className="mx-auto mt-20 max-w-2xl border-t border-[#44313D]/10 pt-10 md:mt-24">
+            <div className="mx-auto mt-20 max-w-2xl border-t border-[#33241D]/10 pt-10 md:mt-24">
               <div className="flex flex-col items-center text-center">
                 <div className="flex items-center gap-4">
                   <span
@@ -233,24 +218,24 @@ export default async function ReadingPage({
                   />
                 </div>
 
-                <p className="mt-6 text-xs uppercase tracking-[0.3em] text-[#8B7A70]">
+                <p className="mt-6 text-xs uppercase tracking-[0.3em] text-[#806E63]">
                   End of today&apos;s reading
                 </p>
               </div>
             </div>
 
             {/* Previous / Next */}
-            <div className="mx-auto mt-16 grid max-w-3xl gap-4 border-t border-[#44313D]/10 pt-8 md:grid-cols-2">
+            <div className="mx-auto mt-16 grid max-w-3xl gap-4 border-t border-[#33241D]/10 pt-8 md:grid-cols-2">
               {previousArticle ? (
                 <PageTurnLink
                   href={`/reading/${previousArticle.id}`}
-                  className="group rounded-2xl bg-[#F7F0E9] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-md"
+                  className="group rounded-2xl bg-[#F6EFE7] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-md"
                 >
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-[#9B8D87]">
+                  <span className="text-[11px] uppercase tracking-[0.25em] text-[#75665C]">
                     Previous
                   </span>
 
-                  <p className="mt-3 font-serif text-lg leading-7 text-[#44313D]">
+                  <p className="mt-3 font-serif text-lg leading-7 text-[#33241D]">
                     {previousArticle.title}
                   </p>
 
@@ -268,13 +253,13 @@ export default async function ReadingPage({
               {nextArticle ? (
                 <PageTurnLink
                   href={`/reading/${nextArticle.id}`}
-                  className="group rounded-2xl bg-[#F7F0E9] p-6 text-left transition duration-300 hover:-translate-y-1 hover:shadow-md md:text-right"
+                  className="group rounded-2xl bg-[#F6EFE7] p-6 text-left transition duration-300 hover:-translate-y-1 hover:shadow-md md:text-right"
                 >
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-[#9B8D87]">
+                  <span className="text-[11px] uppercase tracking-[0.25em] text-[#75665C]">
                     Next
                   </span>
 
-                  <p className="mt-3 font-serif text-lg leading-7 text-[#44313D]">
+                  <p className="mt-3 font-serif text-lg leading-7 text-[#33241D]">
                     {nextArticle.title}
                   </p>
 
@@ -292,12 +277,12 @@ export default async function ReadingPage({
 
             {/* Back to topic */}
             <div className="mt-10 text-center">
-              <a
+              <Link
                 href={`/topics/${article.topic}`}
-                className="text-sm text-[#8B7A70] transition hover:text-[#D9828B]"
+                className="text-sm text-[#806E63] transition hover:text-[#805334]"
               >
                 ← Back to {article.topic}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -305,7 +290,7 @@ export default async function ReadingPage({
 
       {/* Footer */}
       <footer className="px-6 pb-10 text-center">
-        <p className="text-xs tracking-[0.22em] text-[#A3938B]">
+        <p className="text-xs tracking-[0.22em] text-[#75665C]">
           READ SLOWLY · LIVE DEEPLY
         </p>
       </footer>

@@ -8,59 +8,64 @@ type Quote = {
   display_order: number;
 };
 
-export default function HomeQuoteCarousel({
-  quotes,
-}: {
-  quotes: Quote[];
-}) {
+export default function HomeQuoteCarousel({ quotes }: { quotes: Quote[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
-    if (quotes.length <= 1) {
-      return;
-    }
+    if (quotes.length < 2 || paused) return;
 
-    const interval = setInterval(() => {
+    const timer = window.setInterval(() => {
       setCurrentIndex((current) => (current + 1) % quotes.length);
-    }, 4500);
+    }, 3000);
 
-    return () => clearInterval(interval);
-  }, [quotes.length]);
+    return () => window.clearInterval(timer);
+  }, [quotes.length, paused]);
 
-  if (quotes.length === 0) {
-    return (
-      <p className="font-serif text-xl leading-9 text-[#44313D] md:text-2xl md:leading-10">
-        Take a moment. Let the words meet you where you are.
-      </p>
-    );
-  }
+  if (quotes.length === 0) return null;
 
-  const quote = quotes[currentIndex];
+  const index = currentIndex % quotes.length;
+  const quote = quotes[index];
 
   return (
-    <div className="flex min-h-[230px] items-center justify-center px-4 text-center">
-      <div
-        key={quote.id}
-        className="iserein-quote-fade flex max-w-xl items-center justify-center"
-      >
-        <span
-          aria-hidden="true"
-          className="mr-3 self-start pt-1 font-serif text-6xl font-normal leading-none text-[#D9828B] md:text-7xl"
-        >
-          “
-        </span>
+    <div className="iserein-home-quote">
+      <blockquote aria-live={paused ? "polite" : "off"} aria-atomic="true">
+        <p>{quote.sentence}</p>
+      </blockquote>
 
-        <p className="font-serif text-xl font-normal leading-9 text-[#44313D] md:text-2xl md:leading-10">
-          {quote.sentence}
-        </p>
-
-        <span
-          aria-hidden="true"
-          className="ml-3 self-end pb-1 font-serif text-6xl font-normal leading-none text-[#D9828B] md:text-7xl"
-        >
-          ”
-        </span>
-      </div>
+      {quotes.length > 1 && (
+        <div className="iserein-home-quote-controls" aria-label="Thought navigation">
+          <button
+            type="button"
+            aria-label="Previous thought"
+            onClick={() => setCurrentIndex((current) => (current - 1 + quotes.length) % quotes.length)}
+          >
+            <span aria-hidden="true">←</span>
+          </button>
+          <span>
+            <span className="sr-only">Thought </span>
+            {String(index + 1).padStart(2, "0")}
+            <span aria-hidden="true"> / </span>
+            <span className="sr-only"> of </span>
+            {String(quotes.length).padStart(2, "0")}
+          </span>
+          <button
+            type="button"
+            aria-label="Next thought"
+            onClick={() => setCurrentIndex((current) => (current + 1) % quotes.length)}
+          >
+            <span aria-hidden="true">→</span>
+          </button>
+          <button
+            type="button"
+            aria-label={paused ? "Resume automatic thoughts" : "Pause automatic thoughts"}
+            title={paused ? "Resume automatic thoughts" : "Pause automatic thoughts"}
+            onClick={() => setPaused((current) => !current)}
+          >
+            <span aria-hidden="true">{paused ? "▶" : "Ⅱ"}</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,24 +1,8 @@
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { getTopicTheme } from "@/lib/reading-theme";
 
 const PAGE_SIZE = 6;
-
-const topicStyles = {
-  Self: {
-    background: "#6B2636",
-    lightBackground: "#F1E4E7",
-    accent: "#C8A96B",
-  },
-  Life: {
-    background: "#173A70",
-    lightBackground: "#E5EBF4",
-    accent: "#C8A96B",
-  },
-  Growth: {
-    background: "#0D3B33",
-    lightBackground: "#E3ECE8",
-    accent: "#C8A96B",
-  },
-};
 
 export default async function TopicPage({
   params,
@@ -37,12 +21,7 @@ export default async function TopicPage({
   const from = (currentPage - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
 
-  const style =
-    topicStyles[topicName as keyof typeof topicStyles] ?? {
-      background: "#142132",
-      lightBackground: "#E8EBEF",
-      accent: "#C8A96B",
-    };
+  const style = getTopicTheme(topicName);
 
   const { data: articles, error, count } = await supabase
     .from("articles")
@@ -65,62 +44,62 @@ export default async function TopicPage({
   const hasNextPage = currentPage < totalPages;
 
   return (
-    <main className="min-h-screen bg-[#0D1117] text-[#F4EFE3]">
+    <main className="min-h-screen bg-[#F6F0E8] text-[#33241D]">
       {/* HEADER */}
-      <header className="border-b border-white/10 bg-[#0D1117]">
+      <header className="border-b border-[#33241D]/10 bg-[#F6F0E8]">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
-          <a
+          <Link
             href="/"
-            className="text-2xl font-semibold tracking-[0.22em] text-[#F4EFE3]"
+            className="iserein-brand text-xl"
           >
             iSEREIN
-          </a>
+          </Link>
 
-          <nav className="hidden items-center gap-10 text-sm text-[#AEB8C5] md:flex">
-            <a
+          <nav className="hidden items-center gap-10 text-sm text-[#75665C] md:flex">
+            <Link
               href="/"
-              className="transition-colors hover:text-[#C8A96B]"
+              className="transition-colors hover:text-[#805334]"
             >
               Today
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/topics"
-              className="transition-colors hover:text-[#C8A96B]"
+              className="transition-colors hover:text-[#805334]"
             >
               Topics
-            </a>
+            </Link>
 
-            <a
+            <Link
               href="/saved"
-              className="transition-colors hover:text-[#C8A96B]"
+              className="transition-colors hover:text-[#805334]"
             >
               Saved
-            </a>
+            </Link>
           </nav>
 
-          <a
+          <Link
             href="/"
-            className="text-sm text-[#AEB8C5] transition-colors hover:text-[#C8A96B]"
+            className="text-sm text-[#75665C] transition-colors hover:text-[#805334]"
           >
             ← Home
-          </a>
+          </Link>
         </div>
       </header>
 
       {/* TOPIC HERO */}
       <section
         className="px-6 py-24 md:py-32"
-        style={{ backgroundColor: style.background }}
+        style={{ backgroundColor: style.surface }}
       >
         <div className="mx-auto max-w-7xl">
           <div className="max-w-4xl">
-            <a
+            <Link
               href="/topics"
-              className="text-sm text-white/75 transition-colors hover:text-white"
+              className="text-sm text-[#33241D] transition-colors hover:text-[#33241D]"
             >
               ← All topics
-            </a>
+            </Link>
 
             <div className="mt-14 flex items-center gap-4">
               <span
@@ -128,16 +107,16 @@ export default async function TopicPage({
                 style={{ backgroundColor: style.accent }}
               />
 
-              <p className="text-xs font-medium uppercase tracking-[0.3em] text-white">
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-[#33241D]">
                 iSEREIN topic
               </p>
             </div>
 
-            <h1 className="mt-7 font-serif text-6xl font-medium tracking-tight text-white md:text-8xl">
+            <h1 className="mt-7 font-serif text-6xl font-medium tracking-tight text-[#33241D] md:text-8xl">
               {topicName}
             </h1>
 
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/80 md:text-xl">
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#33241D] md:text-xl">
               Explore readings created for this part of your life.
             </p>
           </div>
@@ -145,7 +124,7 @@ export default async function TopicPage({
       </section>
 
       {/* ARTICLES */}
-      <section className="bg-[#0D1117] px-6 py-20 md:py-28">
+      <section className="bg-[#F6F0E8] px-6 py-20 md:py-28">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 flex items-end justify-between">
             <div>
@@ -156,12 +135,12 @@ export default async function TopicPage({
                 The collection
               </p>
 
-              <h2 className="mt-4 text-3xl font-light text-[#F4EFE3] md:text-4xl">
+              <h2 className="mt-4 text-3xl font-light text-[#33241D] md:text-4xl">
                 Take your time.
               </h2>
             </div>
 
-            <p className="hidden text-sm text-[#8894A1] md:block">
+            <p className="hidden text-sm text-[#75665C] md:block">
               One page at a time.
             </p>
           </div>
@@ -172,47 +151,47 @@ export default async function TopicPage({
                 {articles.map((article, index) => (
                   <article
                     key={article.id}
-                    className="group overflow-hidden rounded-[1.8rem] bg-[#F4EFE3] text-[#142132] shadow-[0_25px_70px_rgba(0,0,0,0.24)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_80px_rgba(0,0,0,0.32)]"
+                    className="group overflow-hidden rounded-[1.8rem] bg-[#FFFDF9] text-[#33241D] shadow-[0_12px_40px_rgba(51,36,29,0.065)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_48px_rgba(51,36,29,0.10)]"
                   >
                     {/* Topic colour */}
                     <div
                       className="h-2"
-                      style={{ backgroundColor: style.background }}
+                      style={{ backgroundColor: style.surface }}
                     />
 
                     <div className="p-8 md:p-10">
                       <div className="flex items-center justify-between">
                         <span
-                          className="rounded-full px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-white"
-                          style={{ backgroundColor: style.background }}
+                          className="rounded-full px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-[#33241D]"
+                          style={{ backgroundColor: style.surface }}
                         >
                           {article.topic}
                         </span>
 
-                        <span className="text-sm text-[#7A8490]">
+                        <span className="text-sm text-[#75665C]">
                           {article.reading_time} min
                         </span>
                       </div>
 
                       <p
                         className="mt-8 text-xs font-medium tracking-[0.2em]"
-                        style={{ color: style.background }}
+                        style={{ color: style.accent }}
                       >
                         {String(from + index + 1).padStart(2, "0")}
                       </p>
 
-                      <h3 className="mt-4 max-w-2xl text-3xl font-serif font-medium leading-tight text-[#142132] md:text-4xl">
+                      <h3 className="mt-4 max-w-2xl text-3xl font-serif font-medium leading-tight text-[#33241D] md:text-4xl">
                         {article.title}
                       </h3>
 
-                      <p className="mt-5 max-w-2xl text-lg leading-8 text-[#596675]">
+                      <p className="mt-5 max-w-2xl text-lg leading-8 text-[#75655C]">
                         {article.subtitle}
                       </p>
 
                       <div className="my-8 flex items-center gap-3">
                         <span
                           className="h-px w-14"
-                          style={{ backgroundColor: style.background }}
+                          style={{ backgroundColor: style.surface }}
                         />
 
                         <span
@@ -220,34 +199,34 @@ export default async function TopicPage({
                           style={{ backgroundColor: style.accent }}
                         />
 
-                        <span className="h-px flex-1 bg-[#142132]/10" />
+                        <span className="h-px flex-1 bg-[#33241D]/10" />
                       </div>
 
-                      <p className="max-w-2xl leading-8 text-[#43505D]">
+                      <p className="max-w-2xl leading-8 text-[#594B42]">
                         {article.content.split("\n\n")[0]}
                       </p>
 
                       <div className="mt-9">
-                        <a
+                        <Link
                           href={`/reading/${article.id}`}
-                          className="inline-flex items-center rounded-full px-7 py-3.5 text-sm font-medium text-white transition duration-200 hover:opacity-90"
-                          style={{ backgroundColor: style.background }}
+                          className="inline-flex items-center rounded-full px-7 py-3.5 text-sm font-medium text-[#33241D] transition duration-200 hover:opacity-90"
+                          style={{ backgroundColor: style.surface }}
                         >
                           Open reading →
-                        </a>
+                        </Link>
                       </div>
                     </div>
 
                     <div
                       className="border-t px-8 py-4 md:px-10"
                       style={{
-                        borderColor: `${style.background}20`,
-                        backgroundColor: style.lightBackground,
+                        borderColor: `${style.surface}20`,
+                        backgroundColor: style.soft,
                       }}
                     >
                       <p
                         className="text-xs font-medium uppercase tracking-[0.2em]"
-                        style={{ color: style.background }}
+                        style={{ color: style.accent }}
                       >
                         A page worth keeping
                       </p>
@@ -258,42 +237,42 @@ export default async function TopicPage({
 
               {/* PAGINATION */}
               {totalPages > 1 && (
-                <div className="mt-14 flex items-center justify-between border-t border-white/10 pt-8">
+                <div className="mt-14 flex items-center justify-between border-t border-[#33241D]/10 pt-8">
                   <div>
                     {hasPreviousPage ? (
-                      <a
+                      <Link
                         href={`/topics/${topic}?page=${currentPage - 1}`}
-                        className="group inline-flex items-center gap-3 text-sm text-[#F4EFE3] transition-colors hover:text-[#C8A96B]"
+                        className="group inline-flex items-center gap-3 text-sm text-[#33241D] transition-colors hover:text-[#805334]"
                       >
                         <span className="transition-transform group-hover:-translate-x-1">
                           ←
                         </span>
                         Newer readings
-                      </a>
+                      </Link>
                     ) : (
-                      <span className="text-sm text-[#4F5965]">
+                      <span className="text-sm text-[#66574D]">
                         Newer readings
                       </span>
                     )}
                   </div>
 
-                  <div className="text-xs uppercase tracking-[0.2em] text-[#7E8996]">
+                  <div className="text-xs uppercase tracking-[0.2em] text-[#75665C]">
                     Page {currentPage} of {totalPages}
                   </div>
 
                   <div>
                     {hasNextPage ? (
-                      <a
+                      <Link
                         href={`/topics/${topic}?page=${currentPage + 1}`}
-                        className="group inline-flex items-center gap-3 text-sm text-[#F4EFE3] transition-colors hover:text-[#C8A96B]"
+                        className="group inline-flex items-center gap-3 text-sm text-[#33241D] transition-colors hover:text-[#805334]"
                       >
                         Older readings
                         <span className="transition-transform group-hover:translate-x-1">
                           →
                         </span>
-                      </a>
+                      </Link>
                     ) : (
-                      <span className="text-sm text-[#4F5965]">
+                      <span className="text-sm text-[#66574D]">
                         Older readings
                       </span>
                     )}
@@ -302,10 +281,10 @@ export default async function TopicPage({
               )}
             </>
           ) : (
-            <div className="rounded-[2rem] bg-[#F4EFE3] px-8 py-20 text-center text-[#142132] shadow-[0_25px_70px_rgba(0,0,0,0.25)]">
+            <div className="rounded-[2rem] bg-[#FFFDF9] px-8 py-20 text-center text-[#33241D] shadow-[0_12px_40px_rgba(51,36,29,0.065)]">
               <p
                 className="text-xs font-medium uppercase tracking-[0.25em]"
-                style={{ color: style.background }}
+                style={{ color: style.accent }}
               >
                 {topicName}
               </p>
@@ -314,31 +293,31 @@ export default async function TopicPage({
                 No readings here yet.
               </h2>
 
-              <p className="mx-auto mt-5 max-w-lg leading-7 text-[#596675]">
+              <p className="mx-auto mt-5 max-w-lg leading-7 text-[#75655C]">
                 New pages for this topic will appear here as they are
                 published.
               </p>
 
-              <a
+              <Link
                 href="/"
-                className="mt-8 inline-flex rounded-full bg-[#142132] px-7 py-3.5 text-sm font-medium text-[#F4EFE3]"
+                className="iserein-primary mt-8 inline-flex rounded-full px-7 py-3.5 text-sm font-medium text-[#FFF9F0]"
               >
                 Back to today
-              </a>
+              </Link>
             </div>
           )}
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-white/10 bg-[#0D1117] px-6 py-16 text-center">
-        <p className="font-serif text-2xl italic text-[#F4EFE3]">
+      <footer className="iserein-dark-footer border-t border-[#33241D]/10 bg-[#5B3A2D] px-6 py-16 text-center">
+        <p className="font-serif text-2xl italic text-[#FFF9F0]">
           Read slowly. Live deeply.
         </p>
 
-        <div className="mx-auto my-6 h-px w-12 bg-[#C8A96B]" />
+        <div className="mx-auto my-6 h-px w-12 bg-[#A7784D]" />
 
-        <p className="text-xs tracking-[0.25em] text-[#F4EFE3]">
+        <p className="iserein-footer-brand">
           iSEREIN
         </p>
       </footer>
