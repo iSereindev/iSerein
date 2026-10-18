@@ -1,6 +1,8 @@
+import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getTopicTheme } from "@/lib/reading-theme";
+import { shuffleArticleOrder } from "@/lib/article-shuffle";
 
 export const dynamic = "force-dynamic";
 
@@ -11,38 +13,73 @@ export default async function TopicPage({
   searchParams,
 }: {
   params: Promise<{ topic: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{
+    page?: string | string[];
+    shuffle?: string | string[];
+  }>;
 }) {
   const { topic } = await params;
-  const { page } = await searchParams;
+  const { page, shuffle } = await searchParams;
   const today = new Date().toISOString().split("T")[0];
 
   const topicName =
     topic.charAt(0).toUpperCase() + topic.slice(1).toLowerCase();
 
-  const currentPage = Math.max(1, Number(page) || 1);
-  const from = (currentPage - 1) * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
-
   const style = getTopicTheme(topicName);
+  const seed =
+    typeof shuffle === "string" && /^[0-9a-f]{32}$/i.test(shuffle)
+      ? shuffle
+      : randomUUID().replaceAll("-", "");
 
-  const { data: articles, error, count } = await supabase
-    .from("articles")
-    .select(
-      "id, title, subtitle, content, topic, reading_time, published_date",
-      { count: "exact" }
-    )
-    .eq("topic", topicName)
-    .lte("published_date", today)
-    .order("published_date", { ascending: false })
-    .range(from, to);
+  // Load IDs in batches, rather than downloading every article's full text.
+  const publishedIds: { id: number }[] = [];
+  while (true) {
+    const offset = publishedIds.length;
+    const { data: batch, error, count } = await supabase
+      .from("articles")
+      .select("id", { count: "exact" })
+      .eq("topic", topicName)
+      .lte("published_date", today)
+      .order("published_date", { ascending: false })
+      .order("id", { ascending: false })
+      .range(offset, offset + 499);
 
-  if (error) {
-    throw new Error(error.message);
+    if (error) throw new Error(error.message);
+    if (!batch?.length) break;
+
+    publishedIds.push(...batch);
+    if (count !== null ? publishedIds.length >= count : batch.length < 500) break;
   }
 
-  const totalArticles = count ?? 0;
+  const totalArticles = publishedIds.length;
   const totalPages = Math.ceil(totalArticles / PAGE_SIZE);
+  const requestedPage = typeof page === "string" ? Number(page) : 1;
+  const currentPage = Math.min(
+    Number.isSafeInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1,
+    Math.max(1, totalPages)
+  );
+  const from = (currentPage - 1) * PAGE_SIZE;
+  const pageIds = shuffleArticleOrder(publishedIds, `${topicName}:${seed}`)
+    .slice(from, from + PAGE_SIZE)
+    .map(({ id }) => id);
+
+  const { data: pageArticles, error: pageError } = pageIds.length
+    ? await supabase
+        .from("articles")
+        .select("id, title, subtitle, content, topic, reading_time, published_date")
+        .eq("topic", topicName)
+        .lte("published_date", today)
+        .in("id", pageIds)
+    : { data: [], error: null };
+
+  if (pageError) throw new Error(pageError.message);
+
+  // An IN query does not preserve the input order; restore the selected mix.
+  const byId = new Map((pageArticles ?? []).map((article) => [article.id, article]));
+  const articles = pageIds.flatMap((id) => {
+    const article = byId.get(id);
+    return article ? [article] : [];
+  });
 
   const hasPreviousPage = currentPage > 1;
   const hasNextPage = currentPage < totalPages;
@@ -245,17 +282,17 @@ export default async function TopicPage({
                   <div>
                     {hasPreviousPage ? (
                       <Link
-                        href={`/topics/${topic}?page=${currentPage - 1}`}
+                        href={`/topics/${topic}?page=${currentPage - 1}&shuffle=${seed}`}
                         className="group inline-flex items-center gap-3 text-sm text-[#33241D] transition-colors hover:text-[#805334]"
                       >
                         <span className="transition-transform group-hover:-translate-x-1">
                           ←
                         </span>
-                        Newer readings
+                        Previous page
                       </Link>
                     ) : (
                       <span className="text-sm text-[#66574D]">
-                        Newer readings
+                        Previous page
                       </span>
                     )}
                   </div>
@@ -267,17 +304,17 @@ export default async function TopicPage({
                   <div>
                     {hasNextPage ? (
                       <Link
-                        href={`/topics/${topic}?page=${currentPage + 1}`}
+                        href={`/topics/${topic}?page=${currentPage + 1}&shuffle=${seed}`}
                         className="group inline-flex items-center gap-3 text-sm text-[#33241D] transition-colors hover:text-[#805334]"
                       >
-                        Older readings
+                        Next page
                         <span className="transition-transform group-hover:translate-x-1">
                           →
                         </span>
                       </Link>
                     ) : (
                       <span className="text-sm text-[#66574D]">
-                        Older readings
+                        Next page
                       </span>
                     )}
                   </div>
