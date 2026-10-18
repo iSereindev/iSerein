@@ -119,7 +119,12 @@ export default function Home() {
 
       <footer className="iserein-home-footer iserein-home-container">
         <p>Read slowly. Live deeply.</p>
-        <span className="iserein-footer-brand">iSEREIN</span>
+        <div className="iserein-home-footer-links">
+          <Link href="/about" className="iserein-home-text-link">
+            About &amp; Contact
+          </Link>
+          <span className="iserein-footer-brand">iSEREIN</span>
+        </div>
       </footer>
     </main>
   );
