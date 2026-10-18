@@ -116,6 +116,9 @@ export default function Home() {
 
       <footer className="iserein-home-footer iserein-home-container">
         <p>Read slowly. Live deeply.</p>
+        <Link href="/install" className="iserein-home-text-link iserein-install-link">
+          Install iSEREIN <span aria-hidden="true">↗</span>
+        </Link>
         <span className="iserein-footer-brand">iSEREIN</span>
       </footer>
     </main>

@@ -251,6 +251,12 @@ export default function ProfilePage() {
               needed. It won’t sync across devices, and clearing
               browser data removes it.
             </p>
+            <Link
+              href="/install"
+              className="iserein-home-text-link iserein-install-link mt-3"
+            >
+              Install iSEREIN <span aria-hidden="true">↗</span>
+            </Link>
           </div>
         </div>
       </section>
