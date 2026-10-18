@@ -2,6 +2,8 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getTopicTheme } from "@/lib/reading-theme";
 
+export const dynamic = "force-dynamic";
+
 const PAGE_SIZE = 6;
 
 export default async function TopicPage({
@@ -13,6 +15,7 @@ export default async function TopicPage({
 }) {
   const { topic } = await params;
   const { page } = await searchParams;
+  const today = new Date().toISOString().split("T")[0];
 
   const topicName =
     topic.charAt(0).toUpperCase() + topic.slice(1).toLowerCase();
@@ -30,6 +33,7 @@ export default async function TopicPage({
       { count: "exact" }
     )
     .eq("topic", topicName)
+    .lte("published_date", today)
     .order("published_date", { ascending: false })
     .range(from, to);
 

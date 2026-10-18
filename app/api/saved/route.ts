@@ -1,5 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const ids = searchParams.get("ids");
@@ -17,12 +19,15 @@ export async function GET(request: Request) {
     return Response.json([]);
   }
 
+  const today = new Date().toISOString().split("T")[0];
+
   const { data, error } = await supabase
     .from("articles")
     .select(
       "id, title, subtitle, topic, reading_time, published_date"
     )
     .in("id", articleIds)
+    .lte("published_date", today)
     .order("published_date", { ascending: false });
 
   if (error) {

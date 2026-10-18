@@ -4,6 +4,8 @@ import { getTopicTheme } from "@/lib/reading-theme";
 import HomeReading, { HomeReadingSkeleton } from "./HomeReading";
 import HomeThoughts from "./HomeThoughts";
 
+export const dynamic = "force-dynamic";
+
 const topics = [
   { name: "Self", description: "Understand your mind, emotions, and identity." },
   { name: "Life", description: "Find perspective in relationships, work, and everyday life." },

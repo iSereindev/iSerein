@@ -4,12 +4,15 @@ import { getTopicTheme } from "@/lib/reading-theme";
 import SaveButton from "./SaveButton";
 import PageTurnLink from "./PageTurnLink";
 
+export const dynamic = "force-dynamic";
+
 export default async function ReadingPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const today = new Date().toISOString().split("T")[0];
 
   const { data: article, error } = await supabase
     .from("articles")
@@ -17,6 +20,7 @@ export default async function ReadingPage({
       "id, title, subtitle, content, topic, reading_time, published_date"
     )
     .eq("id", id)
+    .lte("published_date", today)
     .maybeSingle();
 
   if (error) {
@@ -58,6 +62,7 @@ export default async function ReadingPage({
     .from("articles")
     .select("id, title")
     .lt("published_date", article.published_date)
+    .lte("published_date", today)
     .order("published_date", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -66,6 +71,7 @@ export default async function ReadingPage({
     .from("articles")
     .select("id, title")
     .gt("published_date", article.published_date)
+    .lte("published_date", today)
     .order("published_date", { ascending: true })
     .limit(1)
     .maybeSingle();
