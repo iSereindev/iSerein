@@ -4,21 +4,21 @@ import { getTopicTheme } from "@/lib/reading-theme";
 const topics = [
   {
     name: "Self",
-    description: "Mind, emotions, identity & confidence",
+    description: "Mind, emotions, identity & inner peace",
     introduction: "A little space to understand yourself.",
     href: "/topics/Self",
     theme: getTopicTheme("Self"),
   },
   {
     name: "Life",
-    description: "Love, relationships, work & meaning",
+    description: "Love, relationships, time & meaning",
     introduction: "Thoughtful pages for being human.",
     href: "/topics/Life",
     theme: getTopicTheme("Life"),
   },
   {
     name: "Growth",
-    description: "Courage, habits, learning & resilience",
+    description: "Ambition, Courage, learning & resilience",
     introduction: "Small steps toward who you are becoming.",
     href: "/topics/Growth",
     theme: getTopicTheme("Growth"),
