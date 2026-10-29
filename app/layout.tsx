@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import BottomNav from "./BottomNav";
 import { InstallProvider } from "./InstallApp";
 import "./globals.css";
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="iserein-page-content">{children}</div>
           <BottomNav />
         </InstallProvider>
+        <Analytics />
       </body>
     </html>
   );
