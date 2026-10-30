@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const tabs = [
   { label: "Home", href: "/", icon: "home" },
   { label: "Topics", href: "/topics", icon: "topics" },
+  { label: "Watch", href: "/watch", icon: "watch" },
   { label: "Explore", href: "/explore", icon: "explore" },
   { label: "Saved", href: "/profile", icon: "saved" },
 ] as const;
@@ -45,6 +46,13 @@ function NavIcon({ name }: { name: IconName }) {
         <>
           <circle cx="12" cy="12" r="9" />
           <path d="m16 8-2.5 5.5L8 16l2.5-5.5L16 8Z" />
+        </>
+      )}
+
+      {name === "watch" && (
+        <>
+          <rect x="4" y="2" width="16" height="20" rx="4" />
+          <path d="m10 8 6 4-6 4V8Z" />
         </>
       )}
 

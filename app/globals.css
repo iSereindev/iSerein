@@ -864,6 +864,119 @@ h3 {
   background: var(--paper);
 }
 
+/* Short videos. Players load only after a reader chooses a video. */
+.iserein-watch-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+
+.iserein-watch-card {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgb(51 36 29 / 10%);
+  border-radius: 24px;
+  background: var(--paper);
+  box-shadow: 0 8px 28px rgb(51 36 29 / 4.5%);
+}
+
+.iserein-watch-title {
+  margin: 0 0 20px;
+  color: var(--foreground);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.iserein-watch-frame {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 9 / 16;
+  margin-inline: auto;
+  border-radius: 16px;
+  background: var(--foreground);
+}
+
+.iserein-watch-play,
+.iserein-watch-player {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+}
+
+.iserein-watch-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.iserein-watch-player { position: absolute; inset: 0; }
+.iserein-watch-poster { width: 100%; height: 100%; object-fit: cover; }
+
+.iserein-watch-play-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1px solid rgb(255 249 240 / 40%);
+  border-radius: 999px;
+  background: var(--chocolate);
+  color: var(--ivory);
+  font-size: 0.875rem;
+  transform: translate(-50%, -50%);
+}
+
+.iserein-watch-caption {
+  margin: 20px 0 0;
+  color: var(--muted-ink);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.iserein-watch-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin-top: 12px;
+  color: var(--bronze-ink);
+  font-size: 0.75rem;
+}
+
+.iserein-watch-controls a,
+.iserein-watch-controls button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.iserein-watch-controls button { cursor: pointer; }
+
+@media (min-width: 768px) {
+  .iserein-watch-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1100px) {
+  .iserein-watch-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
 /* Existing persistent app navigation. */
 .iserein-page-content {
   flex: 1;
@@ -887,7 +1000,7 @@ h3 {
 
 .iserein-bottom-nav-inner {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 6px;
   width: 100%;
   max-width: 640px;

@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const articles = await getPublishedArticleIndex(getPublicationDate());
   return [
     { url: SITE_URL, changeFrequency: "daily", priority: 1 },
-    ...["/topics", "/explore", "/about", "/install"].map((path) => ({ url: `${SITE_URL}${path}` })),
+    ...["/topics", "/watch", "/explore", "/about", "/install"].map((path) => ({ url: `${SITE_URL}${path}` })),
     ...topicNames.map((topic) => ({ url: `${SITE_URL}/topics/${topic}`, changeFrequency: "daily" as const })),
     ...articles.map((article) => ({
       url: `${SITE_URL}/reading/${article.id}`,
