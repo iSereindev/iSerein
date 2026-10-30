@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { getLatestPublishedArticle, type Article } from "@/lib/articles";
+import { getPublicationDate } from "@/lib/publication";
+import { readingText } from "@/lib/reading-text";
 import { getTopicTheme } from "@/lib/reading-theme";
 import SaveButton from "./reading/[id]/SaveButton";
 
@@ -42,33 +44,27 @@ export function HomeReadingSkeleton() {
 }
 
 export default async function HomeReading() {
-  const today = new Date().toISOString().split("T")[0];
+  let article: Article | null = null;
+  let failed = false;
 
   try {
-    const { data: article, error } = await supabase
-      .from("articles")
-      .select(
-        "id, title, subtitle, content, topic, reading_time, published_date"
-      )
-      .lte("published_date", today)
-      .order("published_date", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    article = await getLatestPublishedArticle(getPublicationDate());
+  } catch {
+    failed = true;
+  }
+  if (!article) return <ReadingUnavailable failed={failed} />;
 
-    if (error) return <ReadingUnavailable failed />;
-    if (!article) return <ReadingUnavailable />;
+  const theme = getTopicTheme(article.topic);
+  const excerpt =
+    typeof article.content === "string"
+      ? readingText(article.content.split("\n\n")[0])
+      : "";
 
-    const theme = getTopicTheme(article.topic);
-    const excerpt =
-      typeof article.content === "string"
-        ? article.content.split("\n\n")[0]
-        : "";
-
-    return (
+  return (
       <article className="iserein-home-reading" aria-labelledby="today-reading-title">
         <div className="iserein-home-reading-meta">
           <p className="iserein-home-eyebrow">Today&apos;s reading</p>
-          {article.reading_time > 0 && (
+          {(article.reading_time ?? 0) > 0 && (
             <span>{article.reading_time} min read</span>
           )}
         </div>
@@ -85,7 +81,7 @@ export default async function HomeReading() {
         </h2>
 
         {article.subtitle && (
-          <p className="iserein-home-reading-subtitle">{article.subtitle}</p>
+          <p className="iserein-home-reading-subtitle">{readingText(article.subtitle)}</p>
         )}
 
         {excerpt && <p className="iserein-home-reading-excerpt">{excerpt}</p>}
@@ -101,8 +97,5 @@ export default async function HomeReading() {
           <SaveButton articleId={article.id} />
         </div>
       </article>
-    );
-  } catch {
-    return <ReadingUnavailable failed />;
-  }
+  );
 }

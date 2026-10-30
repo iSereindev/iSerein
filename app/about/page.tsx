@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMetadata } from "@/lib/site-metadata";
 
-export const metadata: Metadata = {
-  title: "About & Contact — iSEREIN",
+export const metadata = pageMetadata({
+  title: "About & Contact",
   description:
     "A space for thoughtful reading about the self, life, and change. Get in touch with iSEREIN for feedback, questions, or reading suggestions.",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

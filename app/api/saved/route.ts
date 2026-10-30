@@ -1,4 +1,6 @@
 import { supabase } from "@/lib/supabase";
+import { getPublicationDate } from "@/lib/publication";
+import { readingText } from "@/lib/reading-text";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +21,7 @@ export async function GET(request: Request) {
     return Response.json([]);
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getPublicationDate();
 
   const { data, error } = await supabase
     .from("articles")
@@ -28,7 +30,8 @@ export async function GET(request: Request) {
     )
     .in("id", articleIds)
     .lte("published_date", today)
-    .order("published_date", { ascending: false });
+    .order("published_date", { ascending: false })
+    .order("id", { ascending: false });
 
   if (error) {
     return Response.json(
@@ -37,5 +40,8 @@ export async function GET(request: Request) {
     );
   }
 
-  return Response.json(data);
+  return Response.json(data?.map((article) => ({
+    ...article,
+    subtitle: article.subtitle ? readingText(article.subtitle) : article.subtitle,
+  })));
 }

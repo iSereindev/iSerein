@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { getTopicTheme } from "@/lib/reading-theme";
+import { pageMetadata } from "@/lib/site-metadata";
+
+export const metadata = pageMetadata({
+  title: "Topics",
+  description: "Find thoughtful readings about Self, Life, and Growth. Choose a topic and discover a page to spend a little time with.",
+  path: "/topics",
+});
 
 const topics = [
   {

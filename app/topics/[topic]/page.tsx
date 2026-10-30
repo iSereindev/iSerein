@@ -1,12 +1,25 @@
+import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { getPublishedArticleIndex } from "@/lib/articles";
+import { getPublicationDate } from "@/lib/publication";
+import { readingText } from "@/lib/reading-text";
+import { getTopicName, topicDescriptions } from "@/lib/topics";
+import { pageMetadata } from "@/lib/site-metadata";
 import { getTopicTheme } from "@/lib/reading-theme";
 import { shuffleArticleOrder } from "@/lib/article-shuffle";
 
 export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 6;
+
+export async function generateMetadata({ params }: { params: Promise<{ topic: string }> }): Promise<Metadata> {
+  const topic = getTopicName((await params).topic);
+  if (!topic) notFound();
+  return pageMetadata({ title: topic, description: topicDescriptions[topic], path: `/topics/${topic}` });
+}
 
 export default async function TopicPage({
   params,
@@ -20,10 +33,9 @@ export default async function TopicPage({
 }) {
   const { topic } = await params;
   const { page, shuffle } = await searchParams;
-  const today = new Date().toISOString().split("T")[0];
-
-  const topicName =
-    topic.charAt(0).toUpperCase() + topic.slice(1).toLowerCase();
+  const today = getPublicationDate();
+  const topicName = getTopicName(topic);
+  if (!topicName) notFound();
 
   const style = getTopicTheme(topicName);
   const seed =
@@ -31,25 +43,7 @@ export default async function TopicPage({
       ? shuffle
       : randomUUID().replaceAll("-", "");
 
-  // Load IDs in batches, rather than downloading every article's full text.
-  const publishedIds: { id: number }[] = [];
-  while (true) {
-    const offset = publishedIds.length;
-    const { data: batch, error, count } = await supabase
-      .from("articles")
-      .select("id", { count: "exact" })
-      .eq("topic", topicName)
-      .lte("published_date", today)
-      .order("published_date", { ascending: false })
-      .order("id", { ascending: false })
-      .range(offset, offset + 499);
-
-    if (error) throw new Error(error.message);
-    if (!batch?.length) break;
-
-    publishedIds.push(...batch);
-    if (count !== null ? publishedIds.length >= count : batch.length < 500) break;
-  }
+  const publishedIds = await getPublishedArticleIndex(today, topicName);
 
   const totalArticles = publishedIds.length;
   const totalPages = Math.ceil(totalArticles / PAGE_SIZE);
@@ -226,7 +220,7 @@ export default async function TopicPage({
                       </h3>
 
                       <p className="mt-5 max-w-2xl text-lg leading-8 text-[#75655C]">
-                        {article.subtitle}
+                        {readingText(article.subtitle || "")}
                       </p>
 
                       <div className="my-8 flex items-center gap-3">
@@ -244,7 +238,7 @@ export default async function TopicPage({
                       </div>
 
                       <p className="max-w-2xl leading-8 text-[#594B42]">
-                        {article.content.split("\n\n")[0]}
+                        {readingText(article.content.split("\n\n")[0])}
                       </p>
 
                       <div className="mt-9">

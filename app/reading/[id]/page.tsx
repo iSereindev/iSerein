@@ -1,10 +1,29 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { notFound } from "next/navigation";
+import { getPublishedArticle, getArticleNeighbours } from "@/lib/articles";
+import { getPublicationDate } from "@/lib/publication";
+import { pageMetadata } from "@/lib/site-metadata";
+import { readingDescription, readingText } from "@/lib/reading-text";
 import { getTopicTheme } from "@/lib/reading-theme";
 import SaveButton from "./SaveButton";
 import PageTurnLink from "./PageTurnLink";
+import ReadingContent from "./ReadingContent";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const article = await getPublishedArticle(id, getPublicationDate());
+  if (!article) notFound();
+  return pageMetadata({
+    title: article.title,
+    description: readingDescription(article.content || "", article.subtitle),
+    path: `/reading/${article.id}`,
+    article: true,
+    image: `/reading/${article.id}/opengraph-image`,
+  });
+}
 
 export default async function ReadingPage({
   params,
@@ -12,69 +31,18 @@ export default async function ReadingPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const today = new Date().toISOString().split("T")[0];
-
-  const { data: article, error } = await supabase
-    .from("articles")
-    .select(
-      "id, title, subtitle, content, topic, reading_time, published_date"
-    )
-    .eq("id", id)
-    .lte("published_date", today)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  if (!article) {
-    return (
-      <main className="min-h-screen bg-[#FFF9F0] px-6 py-24 text-center text-[#33241D]">
-        <p className="text-xs uppercase tracking-[0.3em] text-[#805334]">
-          iSEREIN
-        </p>
-
-        <h1 className="mt-6 font-serif text-3xl font-normal">
-          This reading could not be found.
-        </h1>
-
-        <Link
-          href="/"
-          className="mt-8 inline-block text-sm text-[#805334] transition hover:opacity-70"
-        >
-          Return home
-        </Link>
-      </main>
-    );
-  }
+  const today = getPublicationDate();
+  const article = await getPublishedArticle(id, today);
+  if (!article) notFound();
 
   const topic = getTopicTheme(article.topic);
 
   const content: string =
     typeof article.content === "string" ? article.content : "";
 
-  const paragraphs: string[] = content
-    .split("\n\n")
-    .map((paragraph) => paragraph.trim())
-    .filter((paragraph) => paragraph.length > 0);
-
-  const { data: previousArticle } = await supabase
-    .from("articles")
-    .select("id, title")
-    .lt("published_date", article.published_date)
-    .lte("published_date", today)
-    .order("published_date", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const { data: nextArticle } = await supabase
-    .from("articles")
-    .select("id, title")
-    .gt("published_date", article.published_date)
-    .lte("published_date", today)
-    .order("published_date", { ascending: true })
-    .limit(1)
-    .maybeSingle();
+  const { previousArticle, nextArticle } = await getArticleNeighbours(
+    article.id, article.published_date, today
+  );
 
   return (
     <main className="min-h-screen bg-[#FFF9F0] text-[#33241D]">
@@ -151,7 +119,7 @@ export default async function ReadingPage({
               </h1>
 
               <p className="mx-auto mt-7 max-w-2xl font-serif text-lg leading-8 text-[#6B5D54] md:text-xl md:leading-9">
-                {article.subtitle}
+                {readingText(article.subtitle || "")}
               </p>
 
               <div className="mx-auto mt-10 flex items-center justify-center gap-3">
@@ -180,22 +148,7 @@ export default async function ReadingPage({
 
             {/* Article */}
             <section className="iserein-reading-copy mx-auto mt-20 max-w-2xl md:mt-28">
-              {paragraphs.map((paragraph, index) => (
-                <p
-                  key={index}
-                  className={`font-serif text-[1.08rem] leading-[2] text-[#4B4038] md:text-[1.17rem] md:leading-[2.05] ${
-                    index === 0
-                      ? "first-letter:float-left first-letter:mr-3 first-letter:mt-2 first-letter:font-serif first-letter:text-7xl first-letter:font-normal first-letter:leading-[0.75] first-letter:text-[#805334]"
-                      : ""
-                  } ${
-                    index < paragraphs.length - 1
-                      ? "mb-9 md:mb-10"
-                      : ""
-                  }`}
-                >
-                  {paragraph}
-                </p>
-              ))}
+              <ReadingContent content={content} />
             </section>
 
             {/* Closing */}

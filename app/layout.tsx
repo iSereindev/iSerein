@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import BottomNav from "./BottomNav";
 import { InstallProvider } from "./InstallApp";
+import { pageMetadata, SITE_URL, SITE_DESCRIPTION } from "@/lib/site-metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,10 +17,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  ...pageMetadata({ title: "iSEREIN — A page for yourself", description: SITE_DESCRIPTION, path: "/" }),
   applicationName: "iSEREIN",
-  title: "iSEREIN — A page for yourself",
-  description:
-    "One thoughtful page a day. Explore readings about Self, Life, and Growth.",
   appleWebApp: {
     capable: true,
     title: "iSEREIN",

@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import InstallControls from "../InstallApp";
+import { pageMetadata } from "@/lib/site-metadata";
 
-export const metadata: Metadata = {
-  title: "Install iSEREIN — A page for yourself",
+export const metadata = pageMetadata({
+  title: "Install iSEREIN",
   description:
     "Add iSEREIN to your home screen on iPhone or Android and return to your reading in a tap.",
-};
+  path: "/install",
+});
 
 export default function InstallPage() {
   return (

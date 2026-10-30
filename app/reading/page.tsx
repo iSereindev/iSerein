@@ -1,23 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { getLatestPublishedArticle } from "@/lib/articles";
+import { getPublicationDate } from "@/lib/publication";
 
 export const dynamic = "force-dynamic";
 
 export default async function ReadingIndexPage() {
-  const today = new Date().toISOString().split("T")[0];
-
-  const { data: article, error } = await supabase
-    .from("articles")
-    .select("id")
-    .lte("published_date", today)
-    .order("published_date", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  const article = await getLatestPublishedArticle(getPublicationDate());
 
   if (!article) {
     return (

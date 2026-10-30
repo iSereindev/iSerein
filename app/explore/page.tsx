@@ -1,37 +1,19 @@
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { getActiveBooks } from "@/lib/catalog";
+import { pageMetadata } from "@/lib/site-metadata";
 import { getTopicTheme } from "@/lib/reading-theme";
 import SaveBookButton from "./SaveBookButton";
 
 export const dynamic = "force-dynamic";
 
-type Book = {
-  id: string;
-  title: string;
-  author: string;
-  edition: string | null;
-  topic: string;
-  description: string;
-  affiliate_url: string;
-  cover_url: string | null;
-};
+export const metadata = pageMetadata({
+  title: "Explore the Bookshelf",
+  description: "Discover books selected for the iSEREIN bookshelf, with ideas about the self, life, and growth.",
+  path: "/explore",
+});
 
 export default async function ExplorePage() {
-  const { data, error } = await supabase
-    .from("books")
-    .select(
-      "id, title, author, edition, topic, description, affiliate_url, cover_url"
-    )
-    .eq("active", true)
-    .order("display_order", { ascending: true })
-    .order("created_at", { ascending: true })
-    .order("id", { ascending: true });
-
-  if (error) {
-    throw new Error(`Unable to load the bookshelf: ${error.message}`);
-  }
-
-  const books: Book[] = data ?? [];
+  const books = await getActiveBooks();
 
   return (
     <main className="min-h-screen bg-[#F6F0E8] text-[#33241D]">
