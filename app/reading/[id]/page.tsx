@@ -3,10 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublishedArticle, getArticleNeighbours } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
-import { pageMetadata } from "@/lib/site-metadata";
+import { pageMetadata, SITE_URL } from "@/lib/site-metadata";
 import { readingDescription, readingText } from "@/lib/reading-text";
 import { getTopicTheme } from "@/lib/reading-theme";
 import SaveButton from "./SaveButton";
+import ShareButton from "./ShareButton";
 import PageTurnLink from "./PageTurnLink";
 import ReadingContent from "./ReadingContent";
 
@@ -55,7 +56,10 @@ export default async function ReadingPage({
           iSEREIN
         </Link>
 
-        <SaveButton articleId={article.id} />
+        <div className="flex shrink-0 items-center gap-2">
+          <SaveButton articleId={article.id} />
+          <ShareButton key={article.id} title={article.title} url={`${SITE_URL}/reading/${article.id}`} />
+        </div>
       </div>
 
       {/* Reading area */}
