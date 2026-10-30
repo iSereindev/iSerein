@@ -7,7 +7,7 @@ const tabs = [
   { label: "Home", href: "/", icon: "home" },
   { label: "Topics", href: "/topics", icon: "topics" },
   { label: "Explore", href: "/explore", icon: "explore" },
-  { label: "Profile", href: "/profile", icon: "profile" },
+  { label: "Saved", href: "/profile", icon: "saved" },
 ] as const;
 
 type IconName = (typeof tabs)[number]["icon"];
@@ -48,11 +48,8 @@ function NavIcon({ name }: { name: IconName }) {
         </>
       )}
 
-      {name === "profile" && (
-        <>
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 21v-2a8 8 0 0 1 16 0v2" />
-        </>
+      {name === "saved" && (
+        <path d="M6 3h12v18l-6-4-6 4V3Z" />
       )}
     </svg>
   );

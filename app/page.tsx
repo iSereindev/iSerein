@@ -29,7 +29,7 @@ export default function Home() {
             <Link href="/topics">Topics</Link>
             <Link href="/explore">Explore</Link>
             <Link href="/profile" className="iserein-home-collection">
-              Your collection <span aria-hidden="true">↗</span>
+              Saved <span aria-hidden="true">↗</span>
             </Link>
           </nav>
 

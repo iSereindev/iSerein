@@ -139,7 +139,7 @@ function useSavedCollection<T extends CollectionItem>(
         if (disposed || request.signal.aborted) return;
 
         setError(
-          "We couldn’t load this collection. Your saved list has not been changed."
+          "We couldn’t load your saved items. Your saved list has not been changed."
         );
       } finally {
         if (!disposed && !request.signal.aborted) {
@@ -216,7 +216,7 @@ export default function ProfilePage() {
           </Link>
 
           <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">
-            Your collection
+            Saved
           </span>
         </div>
       </header>
@@ -233,7 +233,7 @@ export default function ProfilePage() {
           </div>
 
           <h1 className="mt-7 font-serif text-5xl font-normal tracking-tight md:text-7xl">
-            Profile
+            Saved
           </h1>
 
           <p className="mt-6 max-w-xl font-serif text-2xl leading-9">
@@ -247,7 +247,7 @@ export default function ProfilePage() {
 
           <div className="mt-8 max-w-xl rounded-2xl border border-[#33241D]/10 bg-[#FFFDF9] px-5 py-4">
             <p className="text-sm leading-6 text-[#75665C]">
-              Your collection is saved in this browser. No account is
+              Your saved list stays in this browser. No account is
               needed. It won’t sync across devices, and clearing
               browser data removes it.
             </p>
@@ -269,7 +269,7 @@ export default function ProfilePage() {
         <div className="mx-auto max-w-7xl">
           <div
             role="group"
-            aria-label="Choose a saved collection"
+            aria-label="Choose saved items"
             className="mb-8 flex flex-wrap gap-3 border-t border-[#33241D]/10 pt-7"
           >
             <button
@@ -316,7 +316,7 @@ export default function ProfilePage() {
           <div aria-busy={collection.loading}>
             {collection.loading ? (
               <p role="status" className="py-10 text-[#75665C]">
-                Opening your collection…
+                Opening your saved items…
               </p>
             ) : collection.error ? (
               <div
@@ -346,7 +346,7 @@ export default function ProfilePage() {
                 <p className="mx-auto mt-5 max-w-md leading-8 text-[#75665C]">
                   {selected === "readings"
                     ? "Tap the heart-shaped Save button on a reading to keep it here."
-                    : "Tap Save book in Explore to add a book to your collection."}
+                    : "Tap Save book in Explore to keep a book here."}
                 </p>
 
                 <Link
@@ -366,7 +366,7 @@ export default function ProfilePage() {
                     className="mb-6 text-sm leading-7 text-[#75665C]"
                   >
                     Some saved items are currently unavailable. Their
-                    saved references are still in your collection.
+                    saved references are still kept here.
                   </p>
                 )}
 

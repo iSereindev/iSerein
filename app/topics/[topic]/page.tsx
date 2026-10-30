@@ -124,7 +124,7 @@ export default async function TopicPage({
 
       {/* TOPIC HERO */}
       <section
-        className="px-6 py-24 md:py-32"
+        className="px-6 py-8 md:py-32"
         style={{ backgroundColor: style.surface }}
       >
         <div className="mx-auto max-w-7xl">
@@ -136,7 +136,7 @@ export default async function TopicPage({
               ← All topics
             </Link>
 
-            <div className="mt-14 flex items-center gap-4">
+            <div className="mt-4 flex items-center gap-4 md:mt-14">
               <span
                 className="h-px w-12"
                 style={{ backgroundColor: style.accent }}
@@ -147,11 +147,11 @@ export default async function TopicPage({
               </p>
             </div>
 
-            <h1 className="mt-7 font-serif text-6xl font-medium tracking-tight text-[#33241D] md:text-8xl">
+            <h1 className="mt-4 font-serif text-5xl font-medium tracking-tight text-[#33241D] md:mt-7 md:text-8xl">
               {topicName}
             </h1>
 
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#33241D] md:text-xl">
+            <p className="mt-3 max-w-2xl text-base leading-7 text-[#33241D] md:mt-7 md:text-xl md:leading-8">
               Explore readings created for this part of your life.
             </p>
           </div>
@@ -159,9 +159,9 @@ export default async function TopicPage({
       </section>
 
       {/* ARTICLES */}
-      <section className="bg-[#F6F0E8] px-6 py-20 md:py-28">
+      <section className="bg-[#F6F0E8] px-6 py-8 md:py-28">
         <div className="mx-auto max-w-7xl">
-          <div className="mb-12 flex items-end justify-between">
+          <div className="mb-6 flex items-end justify-between md:mb-12">
             <div>
               <p
                 className="text-xs font-medium uppercase tracking-[0.28em]"
@@ -170,7 +170,7 @@ export default async function TopicPage({
                 The collection
               </p>
 
-              <h2 className="mt-4 text-3xl font-light text-[#33241D] md:text-4xl">
+              <h2 className="mt-3 text-2xl font-light text-[#33241D] md:mt-4 md:text-4xl">
                 Take your time.
               </h2>
             </div>
