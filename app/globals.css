@@ -864,6 +864,113 @@ h3 {
   background: var(--paper);
 }
 
+/* A visible stack of readings, with one full article in front. */
+.iserein-topic-page { overflow-x: clip; }
+.iserein-reading-stack { scroll-margin-top: 12px; outline-offset: 8px; }
+.iserein-reading-stack:focus-visible { outline: 2px solid var(--bronze-ink); }
+
+.iserein-stack-toolbar {
+  position: sticky;
+  top: 12px;
+  z-index: 10;
+  display: flex;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--paper);
+  box-shadow: 0 4px 18px rgb(51 36 29 / 6%);
+}
+
+.iserein-stack-control {
+  display: inline-flex;
+  min-width: 48px;
+  min-height: 48px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--topic-soft);
+  color: var(--foreground);
+  font-size: 0.875rem;
+}
+
+.iserein-stack-control > span:first-child { font-size: 1.25rem; line-height: 1; }
+.iserein-stack-control-label { display: none; }
+.iserein-stack-control:disabled { opacity: 0.35; }
+.iserein-stack-control[aria-disabled="true"] { cursor: wait; opacity: 0.6; }
+.iserein-stack-hint { margin: 0; color: var(--muted-ink); font-size: 0.75rem; text-align: center; }
+
+.iserein-stack-stage {
+  position: relative;
+  isolation: isolate;
+  margin-top: 42px;
+  touch-action: pan-y pinch-zoom;
+}
+
+.iserein-stack-under {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 100%;
+  max-height: 600px;
+  border: 1px solid var(--rule);
+  border-top: 5px solid var(--topic-surface);
+  border-radius: 26px;
+  box-shadow: 0 4px 14px rgb(51 36 29 / 5%);
+  transform-origin: top center;
+  pointer-events: none;
+}
+
+.iserein-stack-under.is-far { z-index: 0; background: var(--topic-soft); transform: translate(-7px, -26px) rotate(-1.4deg) scale(0.96); }
+.iserein-stack-under.is-near { z-index: 1; background: #F2EADF; transform: translate(7px, -13px) rotate(1.25deg) scale(0.98); }
+.iserein-stack-front { position: relative; z-index: 2; transform: translateX(var(--drag-x, 0px)); transition: transform 160ms ease; }
+.iserein-stack-front[data-dragging="true"] { transition: none; }
+.iserein-stack-front[aria-busy="true"] { cursor: progress; }
+
+.iserein-stack-paper {
+  padding: 26px 22px 32px;
+  border: 1px solid rgb(51 36 29 / 12%);
+  border-top: 5px solid var(--topic-surface);
+  border-radius: 26px;
+  background: var(--paper);
+  box-shadow: 0 14px 38px rgb(51 36 29 / 7%);
+  animation: iserein-stack-arrive 200ms ease-out both;
+}
+
+.iserein-stack-meta { display: flex; justify-content: space-between; gap: 16px; color: var(--topic-accent); font-size: 0.6875rem; letter-spacing: 0.15em; text-transform: uppercase; }
+.iserein-stack-title { margin: 30px 0 0; color: var(--foreground); font-family: Georgia, "Times New Roman", serif; font-size: clamp(1.9rem, 5vw, 3.25rem); font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; }
+.iserein-stack-subtitle { margin: 18px 0 0; color: var(--muted-ink); font-family: Georgia, "Times New Roman", serif; font-size: 1.0625rem; line-height: 1.8; overflow-wrap: anywhere; }
+.iserein-stack-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 24px; }
+.iserein-stack-copy { margin-top: 36px; padding-top: 30px; border-top: 1px solid var(--rule); }
+.iserein-stack-ending { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.iserein-stack-ending p { margin: 0; color: var(--muted-ink); font-family: Georgia, "Times New Roman", serif; font-size: 1rem; font-style: italic; }
+
+@keyframes iserein-stack-arrive {
+  from { opacity: 0.5; transform: translateX(var(--stack-enter-x, 18px)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (min-width: 640px) {
+  .iserein-stack-control-label { display: inline; }
+  .iserein-stack-control { padding-inline: 20px; }
+  .iserein-stack-hint { font-size: 0.875rem; }
+  .iserein-stack-paper { padding: 44px 56px 48px; }
+  .iserein-stack-copy { margin-top: 44px; padding-top: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iserein-stack-paper { animation: none; }
+  .iserein-stack-front { transition: none; transform: none; }
+}
+
 /* Short videos. Players load only after a reader chooses a video. */
 .iserein-watch-grid {
   display: grid;
