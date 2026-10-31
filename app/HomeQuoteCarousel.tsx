@@ -8,8 +8,8 @@ type Quote = {
   display_order: number;
 };
 
-export default function HomeQuoteCarousel({ quotes }: { quotes: Quote[] }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+export default function HomeQuoteCarousel({ quotes, initialQuoteId = null }: { quotes: Quote[]; initialQuoteId?: number | null }) {
+  const [currentIndex, setCurrentIndex] = useState(() => Math.max(0, quotes.findIndex(quote => quote.id === initialQuoteId)));
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {

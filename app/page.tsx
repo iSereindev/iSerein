@@ -12,7 +12,9 @@ const topics = [
   { name: "Growth", description: "Build courage, good habits, and a little momentum." },
 ];
 
-export default function Home() {
+export default async function Home({ searchParams }: { searchParams: Promise<{ thought?: string | string[] }> }) {
+  const thought = (await searchParams).thought;
+  const thoughtId = typeof thought === "string" && /^[1-9]\d*$/.test(thought) && Number.isSafeInteger(Number(thought)) ? Number(thought) : null;
   return (
     <main id="home-content" className="iserein-home">
       <a className="iserein-skip-link" href="#today-reading">
@@ -114,7 +116,7 @@ export default function Home() {
       </section>
 
       <Suspense fallback={null}>
-        <HomeThoughts />
+        <HomeThoughts thoughtId={thoughtId} />
       </Suspense>
 
       <footer className="iserein-home-footer iserein-home-container">
@@ -123,6 +125,7 @@ export default function Home() {
           <Link href="/about" className="iserein-home-text-link">
             About &amp; Contact
           </Link>
+          <Link href="/install#quote-reminders" className="iserein-home-text-link">Quote reminders</Link>
           <span className="iserein-footer-brand">iSEREIN</span>
         </div>
       </footer>

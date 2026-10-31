@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import InstallControls from "../InstallApp";
+import QuoteReminders from "../QuoteReminders";
 import { pageMetadata } from "@/lib/site-metadata";
 
 export const metadata = pageMetadata({
@@ -73,6 +74,12 @@ export default function InstallPage() {
             </ol>
           </section>
         </div>
+
+        <section id="quote-reminders" className="iserein-install-notes" aria-labelledby="quote-reminders-heading">
+          <h2 id="quote-reminders-heading" className="font-serif text-2xl text-[#33241D]">Daily quote reminders.</h2>
+          <p>Choose one quote a day on this device. You can turn reminders off here at any time.</p>
+          <QuoteReminders label="Manage daily reminders" />
+        </section>
 
         <aside className="iserein-install-notes" aria-label="Installation notes">
           <p>

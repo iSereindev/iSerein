@@ -1,7 +1,8 @@
 import { getActiveQuotes, type HomeQuote } from "@/lib/catalog";
 import HomeQuoteCarousel from "./HomeQuoteCarousel";
+import QuoteReminders from "./QuoteReminders";
 
-export default async function HomeThoughts() {
+export default async function HomeThoughts({ thoughtId = null }: { thoughtId?: number | null }) {
   let quotes: HomeQuote[] = [];
   try {
     quotes = await getActiveQuotes();
@@ -12,11 +13,12 @@ export default async function HomeThoughts() {
   if (!quotes.length) return null;
 
   return (
-    <section className="iserein-home-thoughts iserein-home-container" aria-labelledby="home-thoughts-heading">
+    <section id="thoughts" className="iserein-home-thoughts iserein-home-container" aria-labelledby="home-thoughts-heading">
       <h2 id="home-thoughts-heading" className="iserein-home-eyebrow">
         A thought to take with you
       </h2>
-      <HomeQuoteCarousel quotes={quotes} />
+      <HomeQuoteCarousel key={thoughtId ?? "thoughts"} quotes={quotes} initialQuoteId={thoughtId} />
+      <QuoteReminders />
     </section>
   );
 }
