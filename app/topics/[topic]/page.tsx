@@ -14,6 +14,7 @@ import { topicDeckPosition, topicReadingHref } from "@/lib/topic-deck";
 import ReadingContent from "@/app/reading/[id]/ReadingContent";
 import SaveButton from "@/app/reading/[id]/SaveButton";
 import ShareButton from "@/app/reading/[id]/ShareButton";
+import ArticleFeedback from "@/app/reading/[id]/ArticleFeedback";
 import ReadingStack from "./ReadingStack";
 
 export const dynamic = "force-dynamic";
@@ -95,6 +96,7 @@ export default async function TopicPage({ params, searchParams }: {
                 <section className="iserein-reading-copy iserein-stack-copy" aria-label="Reading text">
                   <ReadingContent content={article.content || ""} />
                 </section>
+                <ArticleFeedback key={article.id} articleId={article.id} />
                 <div className="iserein-stack-ending">
                   <p>Read slowly. Stay awhile.</p>
                   <Link href={`/reading/${article.id}`} className="text-sm text-[#805334] underline underline-offset-4">Open this reading <span aria-hidden="true">↗</span></Link>

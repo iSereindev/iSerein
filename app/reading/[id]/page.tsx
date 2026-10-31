@@ -10,6 +10,7 @@ import SaveButton from "./SaveButton";
 import ShareButton from "./ShareButton";
 import PageTurnLink from "./PageTurnLink";
 import ReadingContent from "./ReadingContent";
+import ArticleFeedback from "./ArticleFeedback";
 
 export const dynamic = "force-dynamic";
 
@@ -154,6 +155,8 @@ export default async function ReadingPage({
             <section className="iserein-reading-copy mx-auto mt-20 max-w-2xl md:mt-28">
               <ReadingContent content={content} />
             </section>
+
+            <ArticleFeedback key={article.id} articleId={article.id} />
 
             {/* Closing */}
             <div className="mx-auto mt-20 max-w-2xl border-t border-[#33241D]/10 pt-10 md:mt-24">
