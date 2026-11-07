@@ -1,4 +1,5 @@
 import Link from "next/link";
+import YouTubeSubscribeLink from "@/app/YouTubeSubscribeLink";
 import { getPublicationDate } from "@/lib/publication";
 import { pageMetadata } from "@/lib/site-metadata";
 import { getPublishedVideos, VIDEOS_PER_PAGE } from "@/lib/videos";
@@ -37,6 +38,7 @@ export default async function WatchPage({
           <p className="mt-4 max-w-xl font-serif text-lg leading-8 text-[#75665C] md:text-xl">
             Short videos for a different perspective.
           </p>
+          <YouTubeSubscribeLink className="mt-6" />
         </div>
       </section>
 

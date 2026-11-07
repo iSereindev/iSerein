@@ -4,6 +4,7 @@ import { useCallback, useId, useState, useSyncExternalStore } from "react";
 import type { FormEvent } from "react";
 import { MAX_FEEDBACK_LENGTH, readStoredFeedback } from "@/lib/article-feedback";
 import type { ArticleReaction } from "@/lib/article-feedback";
+import YouTubeSubscribeLink from "@/app/YouTubeSubscribeLink";
 
 const CHANGE = "iserein-feedback-changed";
 const serverSnapshot = () => null;
@@ -93,6 +94,12 @@ export default function ArticleFeedback({ articleId }: { articleId: number }) {
       </form>}
       <p role="status" aria-live="polite" className="mt-2 text-sm leading-6 text-[#75665C]">{status}</p>
       {error && <p role="alert" className="mt-2 text-sm leading-6 text-[#8C3D2B]">{error}</p>}
+      {current.reaction === "up" && (
+        <div className="mt-6 rounded-2xl border border-[#33241D]/10 bg-[#FFFDF9] px-5 py-5">
+          <p className="text-sm leading-6 text-[#75665C]">Enjoyed this reading? Discover iSEREIN on YouTube.</p>
+          <YouTubeSubscribeLink className="mt-4" />
+        </div>
+      )}
     </section>
   );
 }
