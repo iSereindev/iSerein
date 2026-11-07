@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getTopicTheme } from "@/lib/reading-theme";
 import HomeReading, { HomeReadingSkeleton } from "./HomeReading";
 import HomeThoughts from "./HomeThoughts";
+import { InstallEntryLink } from "./InstallApp";
 
 export const dynamic = "force-dynamic";
 
@@ -35,9 +36,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
             </Link>
           </nav>
 
-          <Link href="/install" className="iserein-primary iserein-home-install iserein-install-link">
-            Install iSEREIN <span aria-hidden="true">↓</span>
-          </Link>
+          <InstallEntryLink />
         </div>
       </header>
 

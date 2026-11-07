@@ -1,17 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { decodePushKey, quoteTimeWindow } from "@/lib/quote-reminders";
+import { embeddedBrowser, installDevice, reminderPrerequisite } from "@/lib/install-environment";
+import InstallHelp from "./InstallHelp";
 
-type Phase = "loading" | "ready" | "on" | "blocked" | "install" | "unsupported" | "unavailable" | "error";
+type Phase = "loading" | "ready" | "on" | "blocked" | "install" | "browser" | "unsupported" | "unavailable" | "error";
 type Config = { ready: boolean; publicKey?: string; enabled?: boolean | null };
 
 class ReminderError extends Error { reenable = false; }
-
-function appleDevice() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-}
 
 async function waitForWorker() {
   let timer: number | undefined;
@@ -30,7 +28,7 @@ function matchesKey(subscription: PushSubscription, key: string) {
   return actual.length === expected.length && actual.every((byte, i) => byte === expected[i]);
 }
 
-export default function QuoteReminders({ label = "Daily quote reminder" }: { label?: string }) {
+export default function QuoteReminders({ label = "Daily quote reminder", openOnHash, inlineInstallHelp = true }: { label?: string; openOnHash?: string; inlineInstallHelp?: boolean }) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<Phase>("loading");
@@ -57,13 +55,16 @@ export default function QuoteReminders({ label = "Daily quote reminder" }: { lab
     } finally { window.clearTimeout(timeout); }
   }
 
-  async function prepare() {
+  const prepare = useCallback(async () => {
     const current = ++generation.current;
     controller.current?.abort(); const abort = new AbortController(); controller.current = abort;
     setPhase("loading"); setMessage(""); setError(""); setWindowLabel(quoteTimeWindow());
     const installed = window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
-    if (appleDevice() && !installed) { setPhase("install"); return; }
-    if (!window.isSecureContext || !("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) { setPhase("unsupported"); return; }
+    const prerequisite = reminderPrerequisite({
+      device: installDevice(navigator), installed, embedded: embeddedBrowser(navigator.userAgent),
+      supported: window.isSecureContext && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window,
+    });
+    if (prerequisite) { setPhase(prerequisite); return; }
     if (Notification.permission === "denied") { setPhase("blocked"); return; }
     const timeout = window.setTimeout(() => abort.abort(), 15000);
     try {
@@ -83,7 +84,22 @@ export default function QuoteReminders({ label = "Daily quote reminder" }: { lab
     } catch {
       if (current === generation.current) { setPhase("error"); setError("Reminders could not be prepared. Please try again."); }
     } finally { window.clearTimeout(timeout); }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (!openOnHash) return;
+    function openFromLink() {
+      if (window.location.hash !== openOnHash) return;
+      setOpen(true);
+      void prepare();
+    }
+    window.addEventListener("hashchange", openFromLink);
+    const frame = window.requestAnimationFrame(openFromLink);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("hashchange", openFromLink);
+    };
+  }, [openOnHash, prepare]);
 
   async function enable() {
     const worker = registration.current;
@@ -141,8 +157,9 @@ export default function QuoteReminders({ label = "Daily quote reminder" }: { lab
       <p className="mt-2 text-sm leading-6 text-[#75665C]">One quote each day. No account or email needed.</p>
       <p className="mt-2 text-xs leading-5 text-[#75665C]">Sent around {windowLabel}. Your device may show it later.</p>
       {phase === "loading" && <p className="mt-4 text-sm text-[#75665C]" role="status">Preparing reminders…</p>}
-      {phase === "install" && <p className="mt-4 text-sm leading-6 text-[#5B3A2D]">Add iSEREIN to your Home Screen, then open it from its icon to enable reminders. <Link href="/install" className="underline underline-offset-4">Installation steps</Link></p>}
-      {phase === "unsupported" && <p className="mt-4 text-sm leading-6 text-[#5B3A2D]">This browser does not support quote notifications here. Try a supported browser, or open the installed iSEREIN app.</p>}
+      {phase === "install" && <div className="mt-4 text-sm leading-6 text-[#5B3A2D]"><p>On iPhone and iPad, first add iSEREIN to your Home Screen, then open its icon to enable notifications.</p>{inlineInstallHelp ? <InstallHelp compact /> : <Link href="#install-device-steps" className="underline underline-offset-4">Follow the installation steps below</Link>}</div>}
+      {phase === "browser" && <div className="mt-4 text-sm leading-6 text-[#5B3A2D]"><p>Open iSEREIN in Safari on iPhone or Chrome on Android to set up reminders. This app’s built-in browser may not support them.</p>{inlineInstallHelp ? <InstallHelp compact /> : <Link href="#install-device-steps" className="underline underline-offset-4">Open the browser and installation steps below</Link>}</div>}
+      {phase === "unsupported" && <p className="mt-4 text-sm leading-6 text-[#5B3A2D]">This browser does not support quote notifications here. On iPhone or iPad, reminders need iOS 16.4 or later and the installed Home Screen app. <Link href="/install" className="underline underline-offset-4">See installation steps</Link></p>}
       {phase === "unavailable" && <p className="mt-4 text-sm leading-6 text-[#75665C]">Daily reminders aren’t available yet. Please try again later.</p>}
       {phase === "blocked" && <p className="mt-4 text-sm leading-6 text-[#5B3A2D]">Notifications are blocked. Allow iSEREIN notifications in your device or browser settings, then check again.</p>}
       <div className="mt-4 flex flex-wrap gap-3">

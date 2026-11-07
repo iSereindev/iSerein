@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import InstallControls from "../InstallApp";
+import InstallHelp from "../InstallHelp";
 import QuoteReminders from "../QuoteReminders";
 import { pageMetadata } from "@/lib/site-metadata";
 
@@ -44,49 +45,15 @@ export default function InstallPage() {
           <InstallControls />
         </section>
 
-        <div className="iserein-install-steps">
-          <section aria-labelledby="install-iphone-heading">
-            <span className="iserein-install-step-label">iPhone &amp; iPad</span>
-            <h2 id="install-iphone-heading">Add with Safari.</h2>
-            <ol>
-              <li>Open this website in <strong>Safari</strong>.</li>
-              <li>Tap <strong>Share</strong> in the browser toolbar or menu.</li>
-              <li>Choose <strong>Add to Home Screen</strong>.</li>
-              <li>
-                Turn on <strong>Open as Web App</strong> if shown, then tap{" "}
-                <strong>Add</strong>.
-              </li>
-            </ol>
-          </section>
-
-          <section aria-labelledby="install-android-heading">
-            <span className="iserein-install-step-label">Android</span>
-            <h2 id="install-android-heading">Add with Chrome.</h2>
-            <ol>
-              <li>Open this website in <strong>Chrome</strong>.</li>
-              <li>Tap the <strong>three-dot menu</strong>.</li>
-              <li>
-                Choose <strong>Install app</strong> or{" "}
-                <strong>Add to Home screen</strong>. Some versions show{" "}
-                <strong>Install and create shortcut</strong> first.
-              </li>
-              <li>Tap <strong>Install</strong> and follow the confirmation.</li>
-            </ol>
-          </section>
-        </div>
-
         <section id="quote-reminders" className="iserein-install-notes" aria-labelledby="quote-reminders-heading">
           <h2 id="quote-reminders-heading" className="font-serif text-2xl text-[#33241D]">Daily quote reminders.</h2>
           <p>Choose one quote a day on this device. You can turn reminders off here at any time.</p>
-          <QuoteReminders label="Manage daily reminders" />
+          <QuoteReminders label="Manage daily reminders" openOnHash="#quote-reminders" inlineInstallHelp={false} />
         </section>
 
+        <InstallHelp />
+
         <aside className="iserein-install-notes" aria-label="Installation notes">
-          <p>
-            Opened this link inside another app? Open it in Safari on iPhone
-            or Chrome on Android to install. On a computer, use your browser’s
-            install option when available.
-          </p>
           <p>
             An internet connection is needed to load readings. Your saved
             collection stays in the browser or installed app where you save

@@ -710,6 +710,26 @@ h3 {
   cursor: wait;
 }
 
+.iserein-install-guide-link { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
+.iserein-install-entry { flex-shrink: 1; white-space: normal; text-align: center; }
+.iserein-install-help, #quote-reminders { scroll-margin-top: 24px; }
+.iserein-install-help { margin-top: 28px; }
+.iserein-install-steps.iserein-install-device { grid-template-columns: minmax(0, 1fr); margin-top: 20px; }
+.iserein-install-browser-note { color: var(--body-ink); font-size: 14px; line-height: 1.8; }
+.iserein-install-copy { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+.iserein-install-copy label { flex-basis: 100%; font-size: 12px; }
+.iserein-install-copy input { min-width: 0; flex: 1 1 180px; width: 100%; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); color: var(--foreground); }
+.iserein-install-copy button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--rule); border-radius: 999px; color: var(--chocolate); font-size: 13px; cursor: pointer; }
+.iserein-install-copy button:hover { background: var(--paper); }
+.iserein-install-copy button:focus-visible, .iserein-install-copy input:focus-visible,
+.iserein-install-other-devices summary:focus-visible { outline: 2px solid var(--chocolate); outline-offset: 4px; }
+.iserein-install-other-devices { margin-top: 20px; }
+.iserein-install-other-devices summary { min-height: 44px; padding-block: 10px; color: var(--chocolate); font-size: 14px; cursor: pointer; }
+.iserein-install-help-compact { margin-top: 18px; }
+.iserein-install-help-compact .iserein-install-steps { grid-template-columns: minmax(0, 1fr); margin-top: 16px; }
+.iserein-install-help-compact .iserein-install-steps section { padding: 18px; border-radius: 16px; }
+.iserein-install-help-compact h4 { margin: 8px 0 14px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 400; }
+
 .iserein-install-steps {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

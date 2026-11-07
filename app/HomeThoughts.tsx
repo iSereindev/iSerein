@@ -1,23 +1,28 @@
 import { getActiveQuotes, type HomeQuote } from "@/lib/catalog";
 import HomeQuoteCarousel from "./HomeQuoteCarousel";
 import QuoteReminders from "./QuoteReminders";
+import { Suspense } from "react";
 
-export default async function HomeThoughts({ thoughtId = null }: { thoughtId?: number | null }) {
+async function Thoughts({ thoughtId }: { thoughtId: number | null }) {
   let quotes: HomeQuote[] = [];
   try {
     quotes = await getActiveQuotes();
   } catch {
-    // Optional quotes must never block access to the readings or topics.
-    return null;
+    // Quote availability must not hide the reminder settings.
   }
-  if (!quotes.length) return null;
+  if (!quotes.length) return <p className="mt-4 text-sm text-[#75665C]">Quotes aren’t available right now. You can still manage reminders below.</p>;
+  return <HomeQuoteCarousel key={thoughtId ?? "thoughts"} quotes={quotes} initialQuoteId={thoughtId} />;
+}
 
+export default function HomeThoughts({ thoughtId = null }: { thoughtId?: number | null }) {
   return (
     <section id="thoughts" className="iserein-home-thoughts iserein-home-container" aria-labelledby="home-thoughts-heading">
       <h2 id="home-thoughts-heading" className="iserein-home-eyebrow">
         A thought to take with you
       </h2>
-      <HomeQuoteCarousel key={thoughtId ?? "thoughts"} quotes={quotes} initialQuoteId={thoughtId} />
+      <Suspense fallback={<p className="mt-4 text-sm text-[#75665C]">Loading thoughts…</p>}>
+        <Thoughts thoughtId={thoughtId} />
+      </Suspense>
       <QuoteReminders />
     </section>
   );
