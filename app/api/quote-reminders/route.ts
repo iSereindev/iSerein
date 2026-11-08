@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { dailyQuote, isQuoteOrigin, QUOTE_UTC_HOUR, quoteDay, quotePayload } from "@/lib/quote-reminders";
 import { getActiveQuotes } from "@/lib/catalog";
 import { endpointHash, getPushSettings, quoteDatabase, quoteJson, quoteReader, quoteReply, rememberQuoteReader, sendEncryptedQuote, validCurveSubscription } from "@/lib/quote-reminder-server";
+import { invalidateReminderCount } from "@/lib/reading-counts-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,10 +55,12 @@ export async function POST(request: NextRequest) {
       const status = await sendEncryptedQuote(target, quotePayload(quote, quoteDay(), true), settings);
       if (status === "expired") {
         await database.rpc("disable_quote_subscription", { p_browser_hash: reader.hash });
+        invalidateReminderCount();
         return quoteReply({ error: "Please re-enable reminders on this device.", reenable: true }, 409);
       }
       if (status !== "sent") return quoteReply({ error: "The test could not be sent. Please try again later." }, 503);
     }
+    if (body.action === "subscribe" || body.action === "disable") invalidateReminderCount();
     return rememberQuoteReader(quoteReply({ accepted: true }), reader.token);
   } catch { return quoteReply({ error: "We couldn’t confirm your reminder settings. Please try again." }, 503); }
 }

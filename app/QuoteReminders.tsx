@@ -5,6 +5,8 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { decodePushKey, quoteTimeWindow } from "@/lib/quote-reminders";
 import { embeddedBrowser, installDevice, reminderPrerequisite } from "@/lib/install-environment";
 import InstallHelp from "./InstallHelp";
+import ReminderSubscriberCount from "./ReminderSubscriberCount";
+import { REMINDER_COUNT_EVENT } from "@/lib/reading-counts";
 
 type Phase = "loading" | "ready" | "on" | "blocked" | "install" | "browser" | "unsupported" | "unavailable" | "error";
 type Config = { ready: boolean; publicKey?: string; enabled?: boolean | null };
@@ -52,6 +54,7 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
         const cause = new ReminderError(typeof value?.error === "string" ? value.error : "We couldn’t confirm your reminder settings. Please try again.");
         cause.reenable = value?.reenable === true; throw cause;
       }
+      if (action === "subscribe" || action === "disable") window.dispatchEvent(new Event(REMINDER_COUNT_EVENT));
     } finally { window.clearTimeout(timeout); }
   }
 
@@ -142,16 +145,19 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
     setBusy(true); setMessage(""); setError("");
     try { await request("test"); setMessage("Test quote sent. Your device may delay showing the notification."); }
     catch (cause) {
-      if (cause instanceof ReminderError && cause.reenable) { setConfig({ ...config, enabled: false }); setPhase("ready"); }
+      if (cause instanceof ReminderError && cause.reenable) { setConfig({ ...config, enabled: false }); setPhase("ready"); window.dispatchEvent(new Event(REMINDER_COUNT_EVENT)); }
       setError(cause instanceof ReminderError ? cause.message : "The test could not be sent. Please try again.");
     } finally { setBusy(false); }
   }
 
   const button = "inline-flex min-h-11 items-center justify-center rounded-full border border-[#5B3A2D]/25 px-5 py-2.5 text-sm text-[#5B3A2D] transition-colors hover:bg-[#F6EFE7] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5B3A2D] disabled:opacity-50";
   return <div className="mt-6">
+    <div className="flex flex-wrap items-center gap-x-3">
     <button type="button" aria-expanded={open} aria-controls={`${id}-panel`} className="inline-flex min-h-11 items-center gap-2 text-sm text-[#5B3A2D] underline decoration-[#5B3A2D]/30 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5B3A2D]" onClick={() => { if (open) { generation.current++; controller.current?.abort(); setOpen(false); } else { setOpen(true); void prepare(); } }}>
       <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>{label}
     </button>
+    <ReminderSubscriberCount />
+    </div>
     {open && <section id={`${id}-panel`} aria-labelledby={`${id}-heading`} className="mt-3 max-w-xl rounded-2xl border border-[#5B3A2D]/15 bg-[#FFFCF8] p-5 text-left sm:p-6">
       <h3 id={`${id}-heading`} className="font-serif text-2xl font-normal leading-8 text-[#33241D]">A thought for your day.</h3>
       <p className="mt-2 text-sm leading-6 text-[#75665C]">One quote each day. No account or email needed.</p>

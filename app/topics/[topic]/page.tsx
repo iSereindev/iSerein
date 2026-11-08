@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
+import ReadingViews from "@/app/ReadingViews";
 import { notFound } from "next/navigation";
 import { getPublishedArticle, getPublishedArticleIndex } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
@@ -84,7 +85,10 @@ export default async function TopicPage({ params, searchParams }: {
               <article className="iserein-stack-article" aria-labelledby={`reading-title-${article.id}`}>
                 <div className="iserein-stack-meta">
                   <span>{topic}</span>
-                  {article.reading_time && <span>{article.reading_time} min</span>}
+                  <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
+                    {article.reading_time && <span>{article.reading_time} min</span>}
+                    <ReadingViews key={article.id} articleId={article.id} separator={!!article.reading_time} />
+                  </div>
                 </div>
                 <header>
                   <h2 id={`reading-title-${article.id}`} className="iserein-stack-title">{article.title}</h2>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
+import ReadingViews from "@/app/ReadingViews";
 import { notFound } from "next/navigation";
 import { getPublishedArticle, getArticleNeighbours } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
@@ -103,9 +104,12 @@ export default async function ReadingPage({
                 </span>
               </div>
 
-              <span className="text-xs uppercase tracking-[0.18em] text-[#75665C]">
-                {article.reading_time} min
-              </span>
+              <div className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1">
+                <span className="text-xs uppercase tracking-[0.18em] text-[#75665C]">
+                  {article.reading_time} min
+                </span>
+                <ReadingViews key={article.id} articleId={article.id} separator />
+              </div>
             </div>
 
             {/* Opening */}
