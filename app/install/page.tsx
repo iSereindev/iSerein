@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 import InstallControls from "../InstallApp";
 import InstallHelp from "../InstallHelp";
 import QuoteReminders from "../QuoteReminders";
@@ -18,7 +19,7 @@ export default function InstallPage() {
       <header className="iserein-home-header">
         <div className="iserein-home-container iserein-home-header-inner">
           <Link href="/" className="iserein-brand" aria-label="iSEREIN home">
-            iSEREIN
+            <BrandLogo />
           </Link>
           <Link href="/" className="iserein-home-text-link">
             Back to reading <span aria-hidden="true">↗</span>
@@ -29,7 +30,7 @@ export default function InstallPage() {
       <div className="iserein-install-container">
         <section className="iserein-install-intro" aria-labelledby="install-heading">
           <Image
-            src="/icons/iserein-192.png"
+            src="/icons/iserein-open-page-192.png"
             width={88}
             height={88}
             alt=""

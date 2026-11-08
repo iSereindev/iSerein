@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 import { pageMetadata } from "@/lib/site-metadata";
 
 export const metadata = pageMetadata({
@@ -14,7 +15,7 @@ export default function AboutPage() {
       <header className="iserein-home-header">
         <div className="iserein-home-container iserein-home-header-inner">
           <Link href="/" className="iserein-brand" aria-label="iSEREIN home">
-            iSEREIN
+            <BrandLogo />
           </Link>
           <Link href="/" className="iserein-home-text-link">
             Back to reading <span aria-hidden="true">↗</span>

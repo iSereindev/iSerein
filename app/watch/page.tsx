@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 import YouTubeSubscribeLink from "@/app/YouTubeSubscribeLink";
 import { getPublicationDate } from "@/lib/publication";
 import { pageMetadata } from "@/lib/site-metadata";
@@ -27,7 +28,7 @@ export default async function WatchPage({
     <main className="min-h-screen bg-[#F6F0E8] text-[#33241D]">
       <header className="border-b border-[#33241D]/10">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-6 md:px-10">
-          <Link href="/" className="iserein-brand text-xl">iSEREIN</Link>
+          <Link href="/" className="iserein-brand text-xl"><BrandLogo /></Link>
           <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">Short films</span>
         </div>
       </header>

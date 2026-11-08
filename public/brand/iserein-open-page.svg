@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="720" viewBox="16 64 480 144" role="img" aria-labelledby="title">
+  <title id="title">iSEREIN Open Page logo</title>
+  <g fill="#5B3A2D">
+    <path d="M32 188 177 83Q185 77 193 80 230 96 256 136 220 108 190 95 185 93 178 99Z"/>
+    <path d="M480 188 335 83Q327 77 319 80 282 96 256 136 292 108 322 95 327 93 334 99Z"/>
+    <path d="M32 188C116 143 196 128 256 154V167C184 140 114 158 32 188Z"/>
+    <path d="M480 188C396 143 316 128 256 154V167C328 140 398 158 480 188Z"/>
+  </g>
+</svg>

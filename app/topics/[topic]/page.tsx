@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 import { notFound } from "next/navigation";
 import { getPublishedArticle, getPublishedArticleIndex } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
@@ -50,7 +51,7 @@ export default async function TopicPage({ params, searchParams }: {
     } as CSSProperties}>
       <header className="border-b border-[#33241D]/10 bg-[#F6F0E8]">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6">
-          <Link href="/" className="iserein-brand text-xl">iSEREIN</Link>
+          <Link href="/" className="iserein-brand text-xl"><BrandLogo /></Link>
           <nav aria-label="Topic navigation" className="hidden items-center gap-10 text-sm text-[#75665C] md:flex">
             <Link href="/" className="transition-colors hover:text-[#805334]">Today</Link>
             <Link href="/topics" className="transition-colors hover:text-[#805334]">Topics</Link>

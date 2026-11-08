@@ -26,8 +26,13 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
   },
   icons: {
+    icon: {
+      url: "/icon.svg",
+      sizes: "any",
+      type: "image/svg+xml",
+    },
     apple: {
-      url: "/icons/iserein-180.png",
+      url: "/icons/iserein-open-page-180.png",
       sizes: "180x180",
       type: "image/png",
     },

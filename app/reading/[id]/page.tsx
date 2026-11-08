@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 import { notFound } from "next/navigation";
 import { getPublishedArticle, getArticleNeighbours } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
@@ -54,7 +55,7 @@ export default async function ReadingPage({
           href="/"
           className="iserein-brand text-lg"
         >
-          iSEREIN
+          <BrandLogo />
         </Link>
 
         <div className="flex shrink-0 items-center gap-2">

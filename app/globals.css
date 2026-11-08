@@ -160,6 +160,24 @@ h3 {
   transition: color 180ms ease;
 }
 
+.iserein-brand-lockup {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  line-height: 1.1;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-transform: none;
+}
+
+.iserein-brand-mark {
+  display: block;
+  width: 2.7em;
+  height: 0.81em;
+  flex-shrink: 0;
+}
+
 .iserein-star-brand,
 .iserein-small-brand,
 .iserein-footer-brand {

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 
 export default function WatchError({ retry }: { retry: () => void }) {
   return (
     <main className="min-h-screen bg-[#F6F0E8] px-6 py-20 text-center text-[#33241D]">
-      <Link href="/" className="iserein-brand">iSEREIN</Link>
+      <Link href="/" className="iserein-brand"><BrandLogo /></Link>
       <h1 className="mt-12 font-serif text-3xl font-normal md:text-5xl">The videos couldn’t load.</h1>
       <p className="mx-auto mt-5 max-w-md leading-8 text-[#75665C]">Please try again in a moment.</p>
       <button type="button" onClick={retry} className="iserein-primary mt-7 rounded-full px-7 py-3 text-sm">Try again</button>

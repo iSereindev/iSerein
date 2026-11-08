@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 import { Suspense } from "react";
 import { getTopicTheme } from "@/lib/reading-theme";
 import HomeReading, { HomeReadingSkeleton } from "./HomeReading";
@@ -25,7 +26,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
       <header className="iserein-home-header">
         <div className="iserein-home-container iserein-home-header-inner">
           <Link href="/" className="iserein-brand" aria-label="iSEREIN home">
-            iSEREIN
+            <BrandLogo />
           </Link>
 
           <nav className="iserein-home-header-nav" aria-label="Homepage navigation">

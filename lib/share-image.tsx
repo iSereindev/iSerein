@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import { OpenPageMark } from "@/app/BrandLogo";
 
 export const shareImageSize = { width: 1200, height: 630 };
 const serifFont = readFile(join(process.cwd(), "assets/share/DejaVuSerif.ttf"));
@@ -21,7 +22,10 @@ export async function shareImage({
       <div style={{ display: "flex", width: "100%", height: "100%", padding: 44, background: "#F6F0E8", color: "#33241D", fontFamily: "Reading Serif" }}>
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: "100%", border: "1px solid #D7C8B8", borderRadius: 24, padding: "38px 48px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ display: "flex", fontSize: 32, letterSpacing: 6, color: "#5B3A2D" }}>iSEREIN</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 32, letterSpacing: 6, color: "#5B3A2D" }}>
+              <OpenPageMark width={72} height={22} />
+              <span>iSEREIN</span>
+            </div>
             <div style={{ display: "flex", fontSize: 20, color: "#75665C" }}>{topic || "A page for yourself"}</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>

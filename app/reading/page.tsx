@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BrandLogo from "@/app/BrandLogo";
 import { redirect } from "next/navigation";
 import { getLatestPublishedArticle } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
@@ -13,7 +14,7 @@ export default async function ReadingIndexPage() {
       <main className="min-h-screen bg-[#F6F0E8] text-[#33241D]">
         <div className="mx-auto max-w-3xl px-6 py-24 text-center">
           <p className="text-sm uppercase tracking-[0.18em] text-[#8C5F42]">
-            iSEREIN
+            <BrandLogo />
           </p>
 
           <h1 className="mt-5 text-3xl font-light">
