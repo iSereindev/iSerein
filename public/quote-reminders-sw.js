@@ -8,7 +8,7 @@ self.addEventListener("push", event => {
   const title = typeof data.title === "string" ? data.title.slice(0, 120) : "iSEREIN · A thought for today";
   const body = typeof data.body === "string" ? data.body.slice(0, 1000) : "A little perspective. A page for yourself.";
   event.waitUntil(self.registration.showNotification(title, {
-    body, icon: "/icons/iserein-open-page-192.png", badge: "/icons/iserein-open-page-badge-96.png",
+    body, icon: "/icons/iserein-signature-v1-192.png", badge: "/icons/iserein-open-page-badge-96.png",
     tag: data.test === true ? "iserein-quote-test" : "iserein-daily-quote",
     renotify: false, silent: true,
     data: { url: typeof data.url === "string" ? data.url : "/#thoughts" },

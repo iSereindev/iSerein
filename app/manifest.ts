@@ -16,19 +16,19 @@ export default function manifest(): MetadataRoute.Manifest {
     prefer_related_applications: false,
     icons: [
       {
-        src: "/icons/iserein-open-page-192.png",
+        src: "/icons/iserein-signature-v1-192.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/iserein-open-page-512.png",
+        src: "/icons/iserein-signature-v1-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/iserein-open-page-512.png",
+        src: "/icons/iserein-signature-v1-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

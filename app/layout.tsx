@@ -32,7 +32,7 @@ export const metadata: Metadata = {
       type: "image/svg+xml",
     },
     apple: {
-      url: "/icons/iserein-open-page-180.png",
+      url: "/icons/iserein-signature-v1-180.png",
       sizes: "180x180",
       type: "image/png",
     },

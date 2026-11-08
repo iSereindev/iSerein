@@ -30,7 +30,7 @@ export default function InstallPage() {
       <div className="iserein-install-container">
         <section className="iserein-install-intro" aria-labelledby="install-heading">
           <Image
-            src="/icons/iserein-open-page-192.png"
+            src="/icons/iserein-signature-v1-192.png"
             width={88}
             height={88}
             alt=""
