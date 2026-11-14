@@ -1,5 +1,5 @@
 import TopicPainting from "@/app/TopicPainting";
-import ReadingEnd from "@/app/ReadingEnd";
+import ReadingEnding from "@/app/ReadingEnding";
 import TopicReadingDirectory from "@/app/TopicReadingDirectory";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
@@ -108,7 +108,7 @@ export default async function TopicPage({ params, searchParams }: {
                   <ReadingContent content={article.content || ""} />
                 </section>
                 <ArticleFeedback key={article.id} articleId={article.id} />
-                <ReadingEnd key={article.id} articleId={article.id} isToday={article.published_date === today} />
+                <ReadingEnding key={article.id} articleId={article.id} isToday={article.published_date === today} today={today} />
 
               </article>
             </ReadingStack>

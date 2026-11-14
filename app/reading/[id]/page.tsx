@@ -1,4 +1,4 @@
-import ReadingEnd from "@/app/ReadingEnd";
+import ReadingEnding from "@/app/ReadingEnding";
 import type { Metadata } from "next";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
@@ -164,7 +164,7 @@ export default async function ReadingPage({
 
             <ArticleFeedback key={article.id} articleId={article.id} />
 
-            <ReadingEnd key={article.id} articleId={article.id} isToday={article.published_date === today} />
+            <ReadingEnding key={article.id} articleId={article.id} isToday={article.published_date === today} today={today} />
 
             <nav aria-label="Other readings" className="mx-auto mt-8 flex max-w-2xl justify-between gap-6 border-t border-[#33241D]/10 pt-4 text-sm">
               {previousArticle ? <PageTurnLink href={`/reading/${previousArticle.id}`} className="min-h-11 py-3">← Previous page</PageTurnLink> : <span />}
