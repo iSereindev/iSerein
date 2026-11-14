@@ -6,10 +6,10 @@ import { useState } from "react";
 import useReadHistory from "./useReadHistory";
 import { getReadIds } from "@/lib/reading-history";
 
-type Reading = { id: number; title: string; published_date: string };
-type Props = { articles: Reading[]; topic: string; currentId?: number };
+type Reading = { id: number; title: string; published_date: string; topic?: string };
+type Props = { articles: Reading[]; topic: string; currentId?: number; directLinks?: boolean };
 
-function TopicList({ articles, topic, currentId, read, unread = false }: Props & { read: number[] | null; unread?: boolean }) {
+function TopicList({ articles, topic, currentId, read, unread = false, directLinks = false }: Props & { read: number[] | null; unread?: boolean }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -19,7 +19,7 @@ function TopicList({ articles, topic, currentId, read, unread = false }: Props &
   const filtered = available.filter(article => article.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   const pages = Math.max(1, Math.ceil(filtered.length / 6));
   const currentPage = Math.min(page, pages - 1);
-  const href = (id: number) => `/topics/${encodeURIComponent(topic)}?reading=${id}#topic-reading`;
+  const href = (id: number) => directLinks ? `/reading/${id}` : `/topics/${encodeURIComponent(topic)}?reading=${id}#topic-reading`;
 
   function surprise() {
     // Re-read on click: completion may have changed in another tab since rendering.
@@ -48,7 +48,7 @@ function TopicList({ articles, topic, currentId, read, unread = false }: Props &
           {filtered.slice(currentPage * 6, currentPage * 6 + 6).map(article => <li key={article.id}>
             <Link href={href(article.id)} aria-current={currentId === article.id ? "page" : undefined}
               className="flex min-h-14 items-center justify-between gap-4 py-3">
-              <span className="font-serif text-lg">{article.title}</span>
+              <span><span className="font-serif text-lg">{article.title}</span>{directLinks && article.topic && <span className="mt-1 block text-xs text-[#75665C]">{article.topic}</span>}</span>
               <span className="shrink-0 text-xs text-[#75665C]">{read?.includes(article.id) ? "✓ Read" : currentId === article.id ? "Open" : "→"}</span>
             </Link>
           </li>)}

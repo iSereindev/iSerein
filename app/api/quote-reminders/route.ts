@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       const readings = await getDayReadings(day);
       const article = readings[0] || await getLatestPublishedArticle(day);
       const payload = readings.length > 1
-        ? { ...digestPayload({ digest_id: "", article_count: readings.length, first_id: readings[0].id, first_title: readings[0].title }, day, true), url: "/readings" }
+        ? { ...digestPayload({ digest_id: "", article_count: readings.length, first_id: readings[0].id, first_title: readings[0].title }, day, true), url: `/readings?day=${day}` }
         : article ? readingPayload(article, day, true) : null;
       if (!payload) return quoteReply({ error: "No content is available right now. Please try again later." }, 503);
       const status = await sendEncryptedQuote(target, payload, settings);

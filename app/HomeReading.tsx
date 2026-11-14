@@ -109,7 +109,7 @@ export default async function HomeReading() {
           <SaveButton articleId={article.id} />
         </div>
       </article>
-      {readings.length > 1 && <Link href="/readings" className="mt-4 inline-flex min-h-11 items-center text-sm text-[#805334]">See all {readings.length} readings →</Link>}
+      {readings.length > 1 && <Link href={`/readings?day=${today}`} className="mt-4 inline-flex min-h-11 items-center text-sm text-[#805334]">See all {readings.length} readings →</Link>}
       {preview}
       <QuoteReminders />
       </div>

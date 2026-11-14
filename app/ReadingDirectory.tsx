@@ -14,7 +14,7 @@ export default function ReadingDirectory({ articles, topic, currentId, directLin
   const currentPage = Math.min(page, pages - 1);
   const href = (id: number) => directLinks ? `/reading/${id}` : `/topics/${encodeURIComponent(topic)}?reading=${id}#topic-reading`;
   return <details key={currentId ?? "index"} open={currentId === undefined} className="mb-6 rounded-2xl border border-[#33241D]/15 bg-[#FFFDF9] px-5">
-    <summary className="cursor-pointer py-4 text-sm font-medium">Browse {topic} <span className="ml-2 font-normal text-[#75665C]">{articles.length} pages</span></summary>
+    <summary className="cursor-pointer py-4 text-sm font-medium">Browse {topic} <span className="ml-2 font-normal text-[#75665C]">{articles.length} {articles.length === 1 ? "page" : "pages"}</span></summary>
     <section aria-label={`${topic} reading list`} className="pb-3">
       <div className="flex flex-wrap items-center gap-3 border-t border-[#33241D]/10 pt-3">
         <input aria-label="Find a reading" type="search" placeholder="Find a title…" value={query} onChange={event => { setQuery(event.target.value); setPage(0); }} className="min-h-11 min-w-0 flex-1 rounded-lg border border-[#33241D]/15 bg-transparent px-3 text-sm" />
