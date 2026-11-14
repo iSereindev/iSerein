@@ -22,7 +22,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
   return (
     <main id="home-content" className="iserein-home">
       <a className="iserein-skip-link" href="#today-reading">
-        Skip to today&apos;s reading
+        Skip to readings
       </a>
 
       <header className="iserein-home-header">
@@ -58,8 +58,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
           </p>
 
           <div className="iserein-home-actions">
-            <Link href="/reading" className="iserein-primary iserein-home-button">
-              Read today&apos;s page <span aria-hidden="true">→</span>
+            <Link href="/readings" className="iserein-primary iserein-home-button">
+              Latest readings <span aria-hidden="true">→</span>
             </Link>
             <Link href="/topics" className="iserein-home-secondary iserein-home-button">
               Explore topics

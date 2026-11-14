@@ -1,6 +1,5 @@
 import { getActiveQuotes, type HomeQuote } from "@/lib/catalog";
 import HomeQuoteCarousel from "./HomeQuoteCarousel";
-import QuoteReminders from "./QuoteReminders";
 import { Suspense } from "react";
 
 async function Thoughts({ thoughtId }: { thoughtId: number | null }) {
@@ -10,7 +9,7 @@ async function Thoughts({ thoughtId }: { thoughtId: number | null }) {
   } catch {
     // Quote availability must not hide the reminder settings.
   }
-  if (!quotes.length) return <p className="mt-4 text-sm text-[#75665C]">Quotes aren’t available right now. You can still manage reminders below.</p>;
+  if (!quotes.length) return <p className="mt-4 text-sm text-[#75665C]">Quotes aren’t available right now.</p>;
   return <HomeQuoteCarousel key={thoughtId ?? "thoughts"} quotes={quotes} initialQuoteId={thoughtId} />;
 }
 
@@ -23,7 +22,6 @@ export default function HomeThoughts({ thoughtId = null }: { thoughtId?: number 
       <Suspense fallback={<p className="mt-4 text-sm text-[#75665C]">Loading thoughts…</p>}>
         <Thoughts thoughtId={thoughtId} />
       </Suspense>
-      <QuoteReminders />
     </section>
   );
 }

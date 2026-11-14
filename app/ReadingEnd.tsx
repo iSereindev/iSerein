@@ -22,9 +22,9 @@ export default function ReadingEnd({ articleId, isToday }: { articleId: number; 
     <div className="mx-auto mt-6 max-w-2xl border-t border-[#33241D]/10 pt-5">
       <div ref={end} className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs text-[#75665C]">{isToday ? "End of today’s reading" : "End of reading"}</p>
-        {!isToday && <Link href="/reading" className="inline-flex min-h-11 items-center text-sm text-[#805334]">Read today&apos;s page →</Link>}
+        {!isToday && <Link href="/readings" className="inline-flex min-h-11 items-center text-sm text-[#805334]">Latest readings →</Link>}
       </div>
-      <QuoteReminders kind="reading" />
+      <QuoteReminders />
     </div>
   );
 }

@@ -8,7 +8,7 @@ import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import ReadingViews from "@/app/ReadingViews";
 import { notFound } from "next/navigation";
-import { getPublishedArticle, getPublishedArticleIndex, getLatestPublishedArticle } from "@/lib/articles";
+import { getPublishedArticle, getPublishedArticleIndex } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
 import { readingText } from "@/lib/reading-text";
 import { getTopicName, topicDescriptions } from "@/lib/topics";
@@ -42,7 +42,6 @@ export default async function TopicPage({ params, searchParams }: {
   const seed = typeof shuffle === "string" && /^[0-9a-f]{32}$/i.test(shuffle)
     ? shuffle : randomUUID().replaceAll("-", "");
   const published = await getPublishedArticleIndex(today, topic);
-  const latest = await getLatestPublishedArticle(today);
   const isShuffled = typeof shuffle === "string" && /^[0-9a-f]{32}$/i.test(shuffle);
   const ids = (isShuffled ? shuffleArticleOrder(published, `${topic}:${seed}`) : published).map(({ id }) => id);
   const position = topicDeckPosition(ids, reading, page);
@@ -109,7 +108,7 @@ export default async function TopicPage({ params, searchParams }: {
                   <ReadingContent content={article.content || ""} />
                 </section>
                 <ArticleFeedback key={article.id} articleId={article.id} />
-                <ReadingEnd key={article.id} articleId={article.id} isToday={latest?.id === article.id} />
+                <ReadingEnd key={article.id} articleId={article.id} isToday={article.published_date === today} />
 
               </article>
             </ReadingStack>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ReadingSummary } from "@/lib/reading-moods";
 import useReadHistory from "./useReadHistory";
 
-export default function ReadingDirectory({ articles, topic, currentId }: { articles: ReadingSummary[]; topic: string; currentId?: number }) {
+export default function ReadingDirectory({ articles, topic, currentId, directLinks = false }: { articles: Pick<ReadingSummary, "id" | "title" | "published_date">[]; topic: string; currentId?: number; directLinks?: boolean }) {
   const read = useReadHistory();
   const [unreadOnly, setUnreadOnly] = useState(false);
   const [page, setPage] = useState(0);
@@ -12,7 +12,7 @@ export default function ReadingDirectory({ articles, topic, currentId }: { artic
   const filtered = articles.filter(article => (!unreadOnly || !read?.includes(article.id)) && article.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()));
   const pages = Math.max(1, Math.ceil(filtered.length / 6));
   const currentPage = Math.min(page, pages - 1);
-  const href = (id: number) => `/topics/${encodeURIComponent(topic)}?reading=${id}#topic-reading`;
+  const href = (id: number) => directLinks ? `/reading/${id}` : `/topics/${encodeURIComponent(topic)}?reading=${id}#topic-reading`;
   return <details key={currentId ?? "index"} open={currentId === undefined} className="mb-6 rounded-2xl border border-[#33241D]/15 bg-[#FFFDF9] px-5">
     <summary className="cursor-pointer py-4 text-sm font-medium">Browse {topic} <span className="ml-2 font-normal text-[#75665C]">{articles.length} pages</span></summary>
     <section aria-label={`${topic} reading list`} className="pb-3">

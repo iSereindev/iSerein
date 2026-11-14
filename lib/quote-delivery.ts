@@ -1,5 +1,6 @@
 export type QuoteDeliveryRow = {
   id: number; endpoint: string; p256dh: string; auth: string; claim_token: string; local_day?: string; reminder_kind?: "reading" | "quote";
+  is_recommendation?: boolean; digest_id?: string; article_count?: number; first_id?: number; first_title?: string;
 };
 export type QuoteDeliveryResult = { id: number; claim_token: string; status: "sent" | "expired" | "failed" };
 

@@ -1,5 +1,7 @@
+import { getDayReadings, getTomorrowTitles, type DailyReading } from "@/lib/daily-publications";
+import QuoteReminders from "./QuoteReminders";
 import Link from "next/link";
-import { getLatestPublishedArticle, type Article } from "@/lib/articles";
+import { getLatestPublishedArticle, getPublishedArticle, type Article } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
 import { readingText } from "@/lib/reading-text";
 import { getTopicTheme } from "@/lib/reading-theme";
@@ -46,13 +48,23 @@ export function HomeReadingSkeleton() {
 export default async function HomeReading() {
   let article: Article | null = null;
   let failed = false;
+  const today = getPublicationDate();
+  let readings: DailyReading[] = [];
+  let tomorrow = { titles: [] as string[], total: 0 };
 
   try {
-    article = await getLatestPublishedArticle(getPublicationDate());
+    readings = await getDayReadings(today);
+    article = readings.length ? await getPublishedArticle(String(readings[0].id), today) : await getLatestPublishedArticle(today);
   } catch {
     failed = true;
   }
-  if (!article) return <ReadingUnavailable failed={failed} />;
+  try { tomorrow = await getTomorrowTitles(); } catch { /* A missing preview must not hide published readings. */ }
+  const preview = tomorrow.total > 0 && <aside className="mt-6 border-t border-[#33241D]/15 pt-5" aria-label="Coming tomorrow">
+    <h3 className="text-xs uppercase tracking-[0.15em] text-[#75665C]">Coming tomorrow</h3>
+    <ul className="mt-3 space-y-2 font-serif text-lg">{tomorrow.titles.map((title, index) => <li key={index}>{title}</li>)}</ul>
+    {tomorrow.total > 3 && <p className="mt-2 text-xs text-[#75665C]">+{tomorrow.total - 3} more</p>}
+  </aside>;
+  if (!article) return <div><ReadingUnavailable failed={failed} />{preview}<QuoteReminders /></div>;
 
   const theme = getTopicTheme(article.topic);
   const excerpt =
@@ -61,9 +73,9 @@ export default async function HomeReading() {
       : "";
 
   return (
-      <article className="iserein-home-reading" aria-labelledby="today-reading-title">
+      <div><article className="iserein-home-reading" aria-labelledby="today-reading-title">
         <div className="iserein-home-reading-meta">
-          <p className="iserein-home-eyebrow">Today&apos;s reading</p>
+          <p className="iserein-home-eyebrow">{article.published_date !== today ? "Latest reading" : readings.length > 1 ? "Today’s readings" : "Today’s reading"}</p>
           {(article.reading_time ?? 0) > 0 && (
             <span>{article.reading_time} min read</span>
           )}
@@ -97,5 +109,9 @@ export default async function HomeReading() {
           <SaveButton articleId={article.id} />
         </div>
       </article>
+      {readings.length > 1 && <Link href="/readings" className="mt-4 inline-flex min-h-11 items-center text-sm text-[#805334]">See all {readings.length} readings →</Link>}
+      {preview}
+      <QuoteReminders />
+      </div>
   );
 }

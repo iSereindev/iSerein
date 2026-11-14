@@ -1,5 +1,7 @@
 # Quieter reading and morning reminders
 
+For the newer title previews and article-only batches, see [article-digests-guide.md](article-digests-guide.md).
+
 Prepared against main 53a674c. Not deployed.
 
 ## What changes

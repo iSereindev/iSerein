@@ -1,13 +1,11 @@
-import { readingPayload } from "@/lib/daily-reminders";
-import { getLatestPublishedArticle } from "@/lib/articles";
+import { digestPayload } from "@/lib/article-digest";
 import "server-only";
 import { createECDH, createHash, createHmac, randomBytes, timingSafeEqual, ECDH } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
 import { NextRequest, NextResponse } from "next/server";
-import { getActiveQuotes } from "@/lib/catalog";
 import { SITE_URL } from "@/lib/site-metadata";
-import { dailyQuote, quoteDay, quotePayload, readQuoteSubscription } from "@/lib/quote-reminders";
+import { quoteDay, quotePayload, readQuoteSubscription } from "@/lib/quote-reminders";
 import { dispatchQuoteBatch } from "@/lib/quote-delivery";
 import type { QuoteDeliveryResult, QuoteDeliveryRow } from "@/lib/quote-delivery";
 import type { QuoteSubscription } from "@/lib/quote-reminders";
@@ -97,29 +95,22 @@ export async function sendEncryptedQuote(subscription: QuoteSubscription, payloa
 export async function runDailyQuotes(settings: PushSettings, day: string, hop = 0) {
   if (day !== quoteDay()) return;
   const database = quoteDatabase(settings);
-  const heartbeat = await database.rpc("record_reminder_tick");
-  if (heartbeat.error) throw new Error("Reminder schedule migration is required");
-  const [quoteResult, articleResult] = await Promise.allSettled([getActiveQuotes(), getLatestPublishedArticle(day)]);
-  const quotes = quoteResult.status === "fulfilled" ? quoteResult.value : [];
-  const latest = articleResult.status === "fulfilled" ? articleResult.value : null;
-  // Do not send an old article again when no page was published today.
-  const article = latest?.published_date === day ? latest : null;
-  if (!quotes.length && !article) return;
   const summary = await dispatchQuoteBatch({
     day, publicKey: settings.publicKey, budgetMs: 20000,
     claim: async (_date, key, limit) => {
-      const { data, error } = await database.rpc("claim_daily_reminders", { p_vapid_public_key: key, p_limit: limit, p_quote_available: quotes.length > 0, p_reading_available: !!article });
-      if (error) throw new Error("Could not claim daily quote deliveries");
+      const { data, error } = await database.rpc("claim_reading_notifications", { p_vapid_public_key: key, p_limit: limit });
+      if (error) throw new Error("Could not claim article notifications");
+      const heartbeat = await database.rpc("record_reminder_tick");
+      if (heartbeat.error) throw new Error("Could not record scheduler health");
       return (data || []) as QuoteDeliveryRow[];
     },
     send: row => {
-      const localDay = row.local_day || day;
-      const quote = dailyQuote(quotes, localDay);
-      const payload = row.reminder_kind === "reading" ? article && readingPayload(article, localDay) : quote && quotePayload(quote, localDay);
-      return payload ? sendEncryptedQuote({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, payload, settings) : Promise.resolve("failed");
+      if (!row.digest_id || !row.article_count || !row.first_id || typeof row.first_title !== "string") return Promise.resolve("failed");
+      const payload = digestPayload({ digest_id: row.digest_id, article_count: row.article_count, first_id: row.first_id, first_title: row.first_title, is_recommendation: row.is_recommendation }, row.local_day || day);
+      return sendEncryptedQuote({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, payload, settings);
     },
     finish: async results => {
-      const { error } = await database.rpc("finish_quote_deliveries", { p_results: results });
+      const { error } = await database.rpc("finish_article_digests", { p_results: results });
       if (error) throw new Error("Could not record daily quote delivery results");
     },
     continueLater: async () => {

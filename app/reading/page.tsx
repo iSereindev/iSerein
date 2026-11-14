@@ -1,3 +1,4 @@
+import { getDayReadings } from "@/lib/daily-publications";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import { redirect } from "next/navigation";
@@ -7,7 +8,10 @@ import { getPublicationDate } from "@/lib/publication";
 export const dynamic = "force-dynamic";
 
 export default async function ReadingIndexPage() {
-  const article = await getLatestPublishedArticle(getPublicationDate());
+  const today = getPublicationDate();
+  const readings = await getDayReadings(today);
+  if (readings.length) redirect(`/reading/${readings[0].id}`);
+  const article = await getLatestPublishedArticle(today);
 
   if (!article) {
     return (

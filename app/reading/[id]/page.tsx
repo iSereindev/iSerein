@@ -4,7 +4,7 @@ import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import ReadingViews from "@/app/ReadingViews";
 import { notFound } from "next/navigation";
-import { getPublishedArticle, getArticleNeighbours, getLatestPublishedArticle } from "@/lib/articles";
+import { getPublishedArticle, getArticleNeighbours } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
 import { pageMetadata, SITE_URL } from "@/lib/site-metadata";
 import { readingDescription, readingText } from "@/lib/reading-text";
@@ -40,7 +40,6 @@ export default async function ReadingPage({
   const article = await getPublishedArticle(id, today);
   if (!article) notFound();
 
-  const latest = await getLatestPublishedArticle(today);
   const topic = getTopicTheme(article.topic);
 
   const content: string =
@@ -165,7 +164,7 @@ export default async function ReadingPage({
 
             <ArticleFeedback key={article.id} articleId={article.id} />
 
-            <ReadingEnd key={article.id} articleId={article.id} isToday={latest?.id === article.id} />
+            <ReadingEnd key={article.id} articleId={article.id} isToday={article.published_date === today} />
 
             <nav aria-label="Other readings" className="mx-auto mt-8 flex max-w-2xl justify-between gap-6 border-t border-[#33241D]/10 pt-4 text-sm">
               {previousArticle ? <PageTurnLink href={`/reading/${previousArticle.id}`} className="min-h-11 py-3">← Previous page</PageTurnLink> : <span />}

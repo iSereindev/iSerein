@@ -1,4 +1,5 @@
 "use client";
+import useReminderReadSync from "./useReminderReadSync";
 
 import Link from "next/link";
 import { bounded, checkOperation } from "@/lib/reminder-operation";
@@ -9,7 +10,7 @@ import InstallHelp from "./InstallHelp";
 import { REMINDER_COUNT_EVENT } from "@/lib/reading-counts";
 
 type Phase = "loading" | "ready" | "on" | "blocked" | "install" | "browser" | "unsupported" | "unavailable" | "error";
-type Config = { ready: boolean; publicKey?: string; enabled?: boolean | null; localTime?: string; timeZone?: string; kind?: "reading" | "quote"; scheduleReady?: boolean };
+type Config = { ready: boolean; publicKey?: string; enabled?: boolean | null; localTime?: string; timeZone?: string; scheduleReady?: boolean };
 
 class ReminderError extends Error { reenable = false; }
 
@@ -26,15 +27,16 @@ function matchesKey(subscription: PushSubscription, key: string) {
   return actual.length === expected.length && actual.every((byte, i) => byte === expected[i]);
 }
 
-export default function QuoteReminders({ label, kind = "quote", openOnHash, inlineInstallHelp = true }: { label?: string; kind?: "reading" | "quote"; openOnHash?: string; inlineInstallHelp?: boolean }) {
+export default function QuoteReminders({ label, openOnHash, inlineInstallHelp = true }: { label?: string; openOnHash?: string; inlineInstallHelp?: boolean }) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<Phase>("loading");
+  const readSyncPending = useReminderReadSync(phase === "on");
   const [config, setConfig] = useState<Config>({ ready: false });
   const [busy, setBusy] = useState(false);
   const [hasLocal, setHasLocal] = useState(false);
   const localTime = "09:00";
-  const [selectedKind, setSelectedKind] = useState(kind);
+  const selectedKind = "reading";
   const [timeZone, setTimeZone] = useState("UTC");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -96,7 +98,6 @@ export default function QuoteReminders({ label, kind = "quote", openOnHash, inli
       if (current !== generation.current) return;
       if (!value.ready || !value.publicKey) { setPhase("unavailable"); return; }
       setConfig(value);
-      if (value.enabled && value.kind) setSelectedKind(value.kind);
       // Opening settings never registers a worker or asks for permission.
       const worker = await bounded(navigator.serviceWorker.getRegistration("/"), abort.signal);
       const subscription = worker ? await bounded(worker.pushManager.getSubscription(), abort.signal) : null;
@@ -137,7 +138,7 @@ export default function QuoteReminders({ label, kind = "quote", openOnHash, inli
     }).catch(() => setError("Couldn’t update your time zone. Open settings to retry."))
       .finally(() => window.clearTimeout(timer));
     return () => { abort.abort(); window.clearTimeout(timer); };
-    // Changes to the draft content choice are saved only by the explicit Save button.
+    // Automatic time-zone refresh never re-enables a disabled subscription.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, config.localTime, config.timeZone, timeZone]);
 
@@ -174,7 +175,7 @@ export default function QuoteReminders({ label, kind = "quote", openOnHash, inli
       await request("subscribe", signal, subscription);
       checkOperation(signal);
       localSubscription.current = subscription;
-      setConfig({ ...config, enabled: true, localTime, timeZone, kind: selectedKind });
+      setConfig({ ...config, enabled: true, localTime, timeZone });
       setHasLocal(true); setPhase("on");
       setOpen(false); setMessage("");
     });
@@ -209,20 +210,17 @@ export default function QuoteReminders({ label, kind = "quote", openOnHash, inli
   const manageable = phase === "on" || phase === "ready";
   return <div className="mt-4 text-left">
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      {phase === "on" ? <span role="status" className="text-sm text-[#5B3A2D]">✓ Daily {config.kind || selectedKind} · 9 AM</span>
+      {phase === "on" ? <span role="status" className="text-sm text-[#5B3A2D]">✓ Daily reading reminders on</span>
         : <button type="button" disabled={busy || phase === "loading"} onClick={() => phase === "ready" ? enable() : setOpen(true)}
-          className={button}>{busy ? "Connecting…" : phase === "loading" ? "Checking reminders…" : "Remind me at 9 AM"}</button>}
-      {phase !== "on" && <span className="text-xs text-[#75665C]">{label || `Daily ${selectedKind} · device notification`}</span>}
+          className={button}>{busy ? "Connecting…" : phase === "loading" ? "Checking reminders…" : "Remind me to read"}</button>}
+      {phase !== "on" && <span className="text-xs text-[#75665C]">{label || "9 AM · based on this device’s read history"}</span>}
       <button type="button" aria-expanded={open} aria-controls={`${id}-panel`} className="min-h-11 text-xs text-[#75665C] underline underline-offset-4" onClick={() => setOpen(value => !value)}>{open ? "Close" : phase === "on" ? "Manage" : "Options"}</button>
     </div>
     {open && <section id={`${id}-panel`} aria-label="Reminder settings" className="mt-2 max-w-xl rounded-xl border border-[#5B3A2D]/15 p-4">
       {manageable && <>
-        <label htmlFor={`${id}-kind`} className="text-sm text-[#5B3A2D]">Remind me about
-          <select id={`${id}-kind`} value={selectedKind} disabled={busy} onChange={event => setSelectedKind(event.target.value as "reading" | "quote")} className="ml-3 min-h-11 rounded-lg border border-[#5B3A2D]/20 bg-[#FFFCF8] px-3">
-            <option value="reading">Daily reading</option><option value="quote">Daily quote</option>
-          </select>
-        </label>
-        <p className="mt-2 text-xs leading-5 text-[#75665C]">Around 9 AM · {timeZone.replaceAll("_", " ")}. One notification per day; tap it to open {selectedKind === "reading" ? "the reading" : "the quote"}.</p>
+        <p className="text-sm leading-6 text-[#75665C]">Around 9 AM · {timeZone.replaceAll("_", " ")}. New readings first; otherwise, an unread page. All caught up? No notification.</p>
+        <p className="mt-2 text-xs leading-5 text-[#75665C]">Completed-reading IDs sync privately for this device. No account needed.</p>
+        {readSyncPending && <p role="status" className="mt-2 text-xs text-[#8C3D2B]">Read-history sync is pending. We’ll retry when you’re online.</p>}
         <div className="mt-3 flex flex-wrap gap-3">
           <button type="button" disabled={busy} onClick={enable} className={button}>{phase === "on" ? "Save" : "Enable"}</button>
           {phase === "on" && <button type="button" disabled={busy} onClick={test} className={button}>Test</button>}
