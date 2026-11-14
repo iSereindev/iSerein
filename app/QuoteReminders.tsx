@@ -6,11 +6,10 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { decodePushKey } from "@/lib/quote-reminders";
 import { embeddedBrowser, installDevice, reminderPrerequisite } from "@/lib/install-environment";
 import InstallHelp from "./InstallHelp";
-import ReminderSubscriberCount from "./ReminderSubscriberCount";
 import { REMINDER_COUNT_EVENT } from "@/lib/reading-counts";
 
 type Phase = "loading" | "ready" | "on" | "blocked" | "install" | "browser" | "unsupported" | "unavailable" | "error";
-type Config = { ready: boolean; publicKey?: string; enabled?: boolean | null; localTime?: string; timeZone?: string; scheduleReady?: boolean };
+type Config = { ready: boolean; publicKey?: string; enabled?: boolean | null; localTime?: string; timeZone?: string; kind?: "reading" | "quote"; scheduleReady?: boolean };
 
 class ReminderError extends Error { reenable = false; }
 
@@ -27,14 +26,15 @@ function matchesKey(subscription: PushSubscription, key: string) {
   return actual.length === expected.length && actual.every((byte, i) => byte === expected[i]);
 }
 
-export default function QuoteReminders({ label = "Daily quote reminder", openOnHash, inlineInstallHelp = true }: { label?: string; openOnHash?: string; inlineInstallHelp?: boolean }) {
+export default function QuoteReminders({ label, kind = "quote", openOnHash, inlineInstallHelp = true }: { label?: string; kind?: "reading" | "quote"; openOnHash?: string; inlineInstallHelp?: boolean }) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const [phase, setPhase] = useState<Phase>("loading");
   const [config, setConfig] = useState<Config>({ ready: false });
   const [busy, setBusy] = useState(false);
   const [hasLocal, setHasLocal] = useState(false);
-  const [localTime, setLocalTime] = useState("08:00");
+  const localTime = "09:00";
+  const [selectedKind, setSelectedKind] = useState(kind);
   const [timeZone, setTimeZone] = useState("UTC");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -50,7 +50,7 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
     const response = await bounded(fetch("/api/quote-reminders", {
       method: "POST", credentials: "same-origin", cache: "no-store",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, subscription: subscription?.toJSON(), localTime, timeZone }),
+      body: JSON.stringify({ action, subscription: subscription?.toJSON(), localTime, timeZone, kind: selectedKind }),
       signal,
     }), signal);
     const value = await bounded(response.json(), signal);
@@ -96,8 +96,7 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
       if (current !== generation.current) return;
       if (!value.ready || !value.publicKey) { setPhase("unavailable"); return; }
       setConfig(value);
-      setLocalTime(value.localTime || "08:00");
-      if (value.timeZone) setTimeZone(value.timeZone);
+      if (value.enabled && value.kind) setSelectedKind(value.kind);
       // Opening settings never registers a worker or asks for permission.
       const worker = await bounded(navigator.serviceWorker.getRegistration("/"), abort.signal);
       const subscription = worker ? await bounded(worker.pushManager.getSubscription(), abort.signal) : null;
@@ -105,11 +104,13 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
       registration.current = worker || null; localSubscription.current = subscription; setHasLocal(!!subscription);
       const active = value.enabled === true && Notification.permission === "granted" && subscription && matchesKey(subscription, value.publicKey);
       setPhase(active ? "on" : "ready");
-      if (!active && (subscription || value.enabled)) setMessage("Reconnect reminders to keep receiving quotes on this device.");
+
     } catch {
       if (current === generation.current) { setPhase("error"); setError("Reminder settings did not load within ten seconds or could not be reached. Check your connection and try again."); }
     } finally { window.clearTimeout(timeout); }
   }, []);
+
+  useEffect(() => { const frame = window.requestAnimationFrame(() => void prepare()); return () => window.cancelAnimationFrame(frame); }, [prepare]);
 
   useEffect(() => {
     if (!openOnHash) return;
@@ -125,6 +126,20 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
       window.removeEventListener("hashchange", openFromLink);
     };
   }, [openOnHash, prepare]);
+
+  useEffect(() => {
+    if (phase !== "on" || busy || !localSubscription.current || (config.localTime === localTime && config.timeZone === timeZone)) return;
+    const abort = new AbortController();
+    const timer = window.setTimeout(() => abort.abort(), 10000);
+    // Keep the saved schedule aligned with this device after travel, with no new permission prompt.
+    void request("sync-timezone", abort.signal).then(() => {
+      setConfig(current => ({ ...current, localTime, timeZone }));
+    }).catch(() => setError("Couldn’t update your time zone. Open settings to retry."))
+      .finally(() => window.clearTimeout(timer));
+    return () => { abort.abort(); window.clearTimeout(timer); };
+    // Changes to the draft content choice are saved only by the explicit Save button.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, config.localTime, config.timeZone, timeZone]);
 
   function enable() {
     if (busy || actionController.current || !config.publicKey) return;
@@ -159,9 +174,9 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
       await request("subscribe", signal, subscription);
       checkOperation(signal);
       localSubscription.current = subscription;
-      setConfig({ ...config, enabled: true, localTime, timeZone });
+      setConfig({ ...config, enabled: true, localTime, timeZone, kind: selectedKind });
       setHasLocal(true); setPhase("on");
-      setMessage("Daily quote reminders are on. Your chosen time is saved.");
+      setOpen(false); setMessage("");
     });
   }
 
@@ -178,7 +193,7 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
 
   function test() {
     void runAction(async signal => {
-      try { await request("test", signal); checkOperation(signal); setMessage("Test quote sent. Your device may delay showing the notification."); }
+      try { await request("test", signal); checkOperation(signal); setMessage("Test sent. It may take a moment to appear."); }
       catch (cause) {
         checkOperation(signal);
         if (cause instanceof ReminderError && cause.reenable) {
@@ -191,40 +206,39 @@ export default function QuoteReminders({ label = "Daily quote reminder", openOnH
   }
 
   const button = "inline-flex min-h-11 items-center justify-center rounded-full border border-[#5B3A2D]/25 px-5 py-2.5 text-sm text-[#5B3A2D] transition-colors hover:bg-[#F6EFE7] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5B3A2D] disabled:opacity-50";
-  return <div className="mt-6">
-    <div className="flex flex-wrap items-center gap-x-3">
-    <button type="button" aria-expanded={open} aria-controls={`${id}-panel`} className="inline-flex min-h-11 items-center gap-2 text-sm text-[#5B3A2D] underline decoration-[#5B3A2D]/30 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5B3A2D]" onClick={() => { if (open) { generation.current++; controller.current?.abort(); actionController.current?.abort(); actionController.current = null; setBusy(false); setOpen(false); } else { setOpen(true); void prepare(); } }}>
-      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>{label}
-    </button>
-    <ReminderSubscriberCount />
+  const manageable = phase === "on" || phase === "ready";
+  return <div className="mt-4 text-left">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+      {phase === "on" ? <span role="status" className="text-sm text-[#5B3A2D]">✓ Daily {config.kind || selectedKind} · 9 AM</span>
+        : <button type="button" disabled={busy || phase === "loading"} onClick={() => phase === "ready" ? enable() : setOpen(true)}
+          className={button}>{busy ? "Connecting…" : phase === "loading" ? "Checking reminders…" : "Remind me at 9 AM"}</button>}
+      {phase !== "on" && <span className="text-xs text-[#75665C]">{label || `Daily ${selectedKind} · device notification`}</span>}
+      <button type="button" aria-expanded={open} aria-controls={`${id}-panel`} className="min-h-11 text-xs text-[#75665C] underline underline-offset-4" onClick={() => setOpen(value => !value)}>{open ? "Close" : phase === "on" ? "Manage" : "Options"}</button>
     </div>
-    {open && <section id={`${id}-panel`} aria-labelledby={`${id}-heading`} className="mt-3 max-w-xl rounded-2xl border border-[#5B3A2D]/15 bg-[#FFFCF8] p-5 text-left sm:p-6">
-      <h3 id={`${id}-heading`} className="font-serif text-2xl font-normal leading-8 text-[#33241D]">A thought for your day.</h3>
-      <p className="mt-2 text-sm leading-6 text-[#75665C]">One quote each day. No account or email needed.</p>
-      <p className="mt-2 text-xs leading-5 text-[#75665C]">Choose a daily time. Delivery is approximate; your device may show it later.</p>
-      {(phase === "ready" || phase === "on") && <div className="mt-4 space-y-3">
-        <label className="block text-sm text-[#33241D]" htmlFor={`${id}-time`}>Reminder time
-          <input id={`${id}-time`} type="time" required value={localTime} disabled={busy} onChange={event => setLocalTime(event.target.value)} className="ml-3 rounded-lg border border-[#5B3A2D]/25 bg-white p-2" />
+    {open && <section id={`${id}-panel`} aria-label="Reminder settings" className="mt-2 max-w-xl rounded-xl border border-[#5B3A2D]/15 p-4">
+      {manageable && <>
+        <label htmlFor={`${id}-kind`} className="text-sm text-[#5B3A2D]">Remind me about
+          <select id={`${id}-kind`} value={selectedKind} disabled={busy} onChange={event => setSelectedKind(event.target.value as "reading" | "quote")} className="ml-3 min-h-11 rounded-lg border border-[#5B3A2D]/20 bg-[#FFFCF8] px-3">
+            <option value="reading">Daily reading</option><option value="quote">Daily quote</option>
+          </select>
         </label>
-        <p className="text-xs text-[#75665C]">Time zone: {timeZone}. This follows daylight-saving changes in that zone.</p>
-        <button type="button" disabled={busy} className="min-h-11 text-xs underline" onClick={() => setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC")}>Use this device’s current time zone</button>
-      </div>}
-      {phase === "loading" && <p className="mt-4 text-sm text-[#75665C]" role="status">Preparing reminders…</p>}
-      {phase === "install" && <div className="mt-4 text-sm leading-6 text-[#5B3A2D]"><p>On iPhone and iPad, first add iSEREIN to your Home Screen, then open its icon to enable notifications.</p>{inlineInstallHelp ? <InstallHelp compact /> : <Link href="#install-device-steps" className="underline underline-offset-4">Follow the installation steps below</Link>}</div>}
-      {phase === "browser" && <div className="mt-4 text-sm leading-6 text-[#5B3A2D]"><p>Open iSEREIN in Safari on iPhone or Chrome on Android to set up reminders. This app’s built-in browser may not support them.</p>{inlineInstallHelp ? <InstallHelp compact /> : <Link href="#install-device-steps" className="underline underline-offset-4">Open the browser and installation steps below</Link>}</div>}
-      {phase === "unsupported" && <p className="mt-4 text-sm leading-6 text-[#5B3A2D]">This browser does not support quote notifications here. On iPhone or iPad, reminders need iOS 16.4 or later and the installed Home Screen app. <Link href="/install" className="underline underline-offset-4">See installation steps</Link></p>}
-      {phase === "unavailable" && <p className="mt-4 text-sm leading-6 text-[#75665C]">Daily reminders aren’t available yet. Please try again later.</p>}
-      {phase === "blocked" && <p className="mt-4 text-sm leading-6 text-[#5B3A2D]">Notifications are blocked. Allow iSEREIN notifications in your device or browser settings, then check again.</p>}
-      {config.ready && config.scheduleReady === false && <p role="status" className="mt-3 text-sm text-[#8C3D2B]">Scheduled delivery is temporarily unavailable. You can save your preference, but reminders will resume only when delivery is restored.</p>}
-      <div className="mt-4 flex flex-wrap gap-3">
-        {phase === "ready" && <button type="button" disabled={busy || !localTime} onClick={enable} className={`${button} bg-[#5B3A2D] text-[#FFF9F0] hover:bg-[#6B4937]`}>{busy ? "Working…" : "Enable daily reminders"}</button>}
-        {phase === "on" && <button type="button" disabled={busy || !localTime} onClick={enable} className={button}>Save reminder time</button>}
-        {phase === "on" && <button type="button" disabled={busy} onClick={() => void test()} className={button}>{busy ? "Working…" : "Send a test quote"}</button>}
-        {(phase === "on" || phase === "ready" && (hasLocal || config.enabled)) && <button type="button" disabled={busy} onClick={() => void disable()} className={button}>Turn reminders off</button>}
-        {["blocked", "error", "unavailable"].includes(phase) && <button type="button" disabled={busy} onClick={() => void prepare()} className={button}>Check again</button>}
-      </div>
-      <p role="status" aria-live="polite" className="mt-3 text-sm leading-6 text-[#75665C]">{message}</p>
-      {error && <p role="alert" className="mt-2 text-sm leading-6 text-[#8C3D2B]">{error}</p>}
+        <p className="mt-2 text-xs leading-5 text-[#75665C]">Around 9 AM · {timeZone.replaceAll("_", " ")}. One notification per day; tap it to open {selectedKind === "reading" ? "the reading" : "the quote"}.</p>
+        <div className="mt-3 flex flex-wrap gap-3">
+          <button type="button" disabled={busy} onClick={enable} className={button}>{phase === "on" ? "Save" : "Enable"}</button>
+          {phase === "on" && <button type="button" disabled={busy} onClick={test} className={button}>Test</button>}
+          {(phase === "on" || hasLocal || config.enabled) && <button type="button" disabled={busy} onClick={disable} className={button}>Turn off</button>}
+        </div>
+      </>}
+      {phase === "loading" && <p className="text-sm" role="status">Checking reminders…</p>}
+      {phase === "install" && <div className="text-sm leading-6"><p>On iPhone or iPad, add iSEREIN to your Home Screen and open it there to enable notifications.</p>{inlineInstallHelp ? <InstallHelp compact /> : <Link href="#install-device-steps" className="underline">Installation steps</Link>}</div>}
+      {phase === "browser" && <p className="text-sm leading-6">Open this page in Safari or Chrome to enable notifications. <Link href="/install" className="underline">Help</Link></p>}
+      {phase === "unsupported" && <p className="text-sm leading-6">This browser cannot receive notifications. <Link href="/install" className="underline">See supported options</Link></p>}
+      {phase === "blocked" && <p className="text-sm leading-6">Notifications are blocked. Allow them in your browser’s site settings, then check again.</p>}
+      {phase === "unavailable" && <p className="text-sm">Reminders are unavailable right now.</p>}
+      {["blocked", "error", "unavailable"].includes(phase) && <button type="button" disabled={busy} onClick={() => void prepare()} className={button}>Check again</button>}
     </section>}
+    {config.ready && config.scheduleReady === false && (phase === "on" || open) && <p role="status" className="mt-2 text-xs text-[#8C3D2B]">{phase === "on" ? "Delivery is temporarily paused. Your preference is saved." : "Scheduled delivery is temporarily unavailable."}</p>}
+    {message && <p role="status" aria-live="polite" className="mt-2 text-xs text-[#75665C]">{message}</p>}
+    {error && <p role="alert" className="mt-2 text-sm text-[#8C3D2B]">{error}</p>}
   </div>;
 }

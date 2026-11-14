@@ -1,5 +1,7 @@
 # iSEREIN reader-return update
 
+This describes the earlier release. For the current simplified UI and 9 AM schedule, see [quiet-reading-guide.md](quiet-reading-guide.md).
+
 This update implements all six reader-feedback improvements. It is prepared against GitHub main 2f1fed5 and can also be applied after the topic-paintings patch. It does not change the quote-carousel timer or artwork.
 
 ## Changes

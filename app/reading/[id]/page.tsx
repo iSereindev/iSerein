@@ -167,56 +167,10 @@ export default async function ReadingPage({
 
             <ReadingEnd key={article.id} articleId={article.id} isToday={latest?.id === article.id} />
 
-            {/* Previous / Next */}
-            <div className="mx-auto mt-16 grid max-w-3xl gap-4 border-t border-[#33241D]/10 pt-8 md:grid-cols-2">
-              {previousArticle ? (
-                <PageTurnLink
-                  href={`/reading/${previousArticle.id}`}
-                  className="group rounded-2xl bg-[#F6EFE7] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-md"
-                >
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-[#75665C]">
-                    Previous
-                  </span>
-
-                  <p className="mt-3 font-serif text-lg leading-7 text-[#33241D]">
-                    {previousArticle.title}
-                  </p>
-
-                  <span
-                    className="mt-5 inline-block text-sm transition group-hover:-translate-x-1"
-                    style={{ color: topic.accent }}
-                  >
-                    ← Previous page
-                  </span>
-                </PageTurnLink>
-              ) : (
-                <div />
-              )}
-
-              {nextArticle ? (
-                <PageTurnLink
-                  href={`/reading/${nextArticle.id}`}
-                  className="group rounded-2xl bg-[#F6EFE7] p-6 text-left transition duration-300 hover:-translate-y-1 hover:shadow-md md:text-right"
-                >
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-[#75665C]">
-                    Next
-                  </span>
-
-                  <p className="mt-3 font-serif text-lg leading-7 text-[#33241D]">
-                    {nextArticle.title}
-                  </p>
-
-                  <span
-                    className="mt-5 inline-block text-sm transition group-hover:translate-x-1"
-                    style={{ color: topic.accent }}
-                  >
-                    Next page →
-                  </span>
-                </PageTurnLink>
-              ) : (
-                <div />
-              )}
-            </div>
+            <nav aria-label="Other readings" className="mx-auto mt-8 flex max-w-2xl justify-between gap-6 border-t border-[#33241D]/10 pt-4 text-sm">
+              {previousArticle ? <PageTurnLink href={`/reading/${previousArticle.id}`} className="min-h-11 py-3">← Previous page</PageTurnLink> : <span />}
+              {nextArticle && <PageTurnLink href={`/reading/${nextArticle.id}`} className="min-h-11 py-3">Next page →</PageTurnLink>}
+            </nav>
 
             {/* Back to topic */}
             <div className="mt-10 text-center">

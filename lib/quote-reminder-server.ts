@@ -1,3 +1,5 @@
+import { readingPayload } from "@/lib/daily-reminders";
+import { getLatestPublishedArticle } from "@/lib/articles";
 import "server-only";
 import { createECDH, createHash, createHmac, randomBytes, timingSafeEqual, ECDH } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
@@ -97,19 +99,24 @@ export async function runDailyQuotes(settings: PushSettings, day: string, hop = 
   const database = quoteDatabase(settings);
   const heartbeat = await database.rpc("record_reminder_tick");
   if (heartbeat.error) throw new Error("Reminder schedule migration is required");
-  const quotes = await getActiveQuotes();
-  if (!quotes.length) { console.info("Daily quotes: no active quote; skipped."); return; }
+  const [quoteResult, articleResult] = await Promise.allSettled([getActiveQuotes(), getLatestPublishedArticle(day)]);
+  const quotes = quoteResult.status === "fulfilled" ? quoteResult.value : [];
+  const latest = articleResult.status === "fulfilled" ? articleResult.value : null;
+  // Do not send an old article again when no page was published today.
+  const article = latest?.published_date === day ? latest : null;
+  if (!quotes.length && !article) return;
   const summary = await dispatchQuoteBatch({
     day, publicKey: settings.publicKey, budgetMs: 20000,
     claim: async (_date, key, limit) => {
-      const { data, error } = await database.rpc("claim_due_quote_deliveries", { p_vapid_public_key: key, p_limit: limit });
+      const { data, error } = await database.rpc("claim_daily_reminders", { p_vapid_public_key: key, p_limit: limit, p_quote_available: quotes.length > 0, p_reading_available: !!article });
       if (error) throw new Error("Could not claim daily quote deliveries");
       return (data || []) as QuoteDeliveryRow[];
     },
     send: row => {
       const localDay = row.local_day || day;
       const quote = dailyQuote(quotes, localDay);
-      return quote ? sendEncryptedQuote({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, quotePayload(quote, localDay), settings) : Promise.resolve("failed");
+      const payload = row.reminder_kind === "reading" ? article && readingPayload(article, localDay) : quote && quotePayload(quote, localDay);
+      return payload ? sendEncryptedQuote({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, payload, settings) : Promise.resolve("failed");
     },
     finish: async results => {
       const { error } = await database.rpc("finish_quote_deliveries", { p_results: results });

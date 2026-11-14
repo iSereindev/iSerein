@@ -1,3 +1,4 @@
+import TopicPainting from "@/app/TopicPainting";
 import ReadingEnd from "@/app/ReadingEnd";
 import ReadingDirectory from "@/app/ReadingDirectory";
 import type { CSSProperties } from "react";
@@ -66,11 +67,11 @@ export default async function TopicPage({ params, searchParams }: {
         </div>
       </header>
 
-      <section className="px-6 py-6 md:py-10" style={{ backgroundColor: theme.surface }}>
+      <section className="iserein-painted-topic px-6 py-10 md:py-14" style={{ backgroundColor: theme.surface }}>
+        <TopicPainting topic={topic} />
         <div className="mx-auto max-w-4xl">
           <Link href="/topics" className="text-sm text-[#33241D]">← All topics</Link>
           <h1 className="mt-4 font-serif text-4xl font-medium tracking-tight md:text-6xl">{topic}</h1>
-          <p className="mt-3 max-w-2xl text-sm leading-7 md:text-base">Explore readings created for this part of your life.</p>
         </div>
       </section>
 
@@ -109,10 +110,7 @@ export default async function TopicPage({ params, searchParams }: {
                 </section>
                 <ArticleFeedback key={article.id} articleId={article.id} />
                 <ReadingEnd key={article.id} articleId={article.id} isToday={latest?.id === article.id} />
-                <div className="iserein-stack-ending">
-                  <p>Read slowly. Stay awhile.</p>
-                  <Link href={`/reading/${article.id}`} className="text-sm text-[#805334] underline underline-offset-4">Open this reading <span aria-hidden="true">↗</span></Link>
-                </div>
+
               </article>
             </ReadingStack>
           ) : published.length ? null : (
