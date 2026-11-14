@@ -88,12 +88,12 @@ export const getArticleNeighbours = unstable_cache(
 
 export const getPublishedArticleIndex = unstable_cache(
   async (today: string, topic?: string) => {
-    const articles: Pick<Article, "id" | "published_date">[] = [];
+    const articles: Pick<Article, "id" | "title" | "subtitle" | "topic" | "published_date">[] = [];
     while (true) {
       const offset = articles.length;
       let query = supabase
         .from("articles")
-        .select("id, published_date", { count: "exact" })
+        .select("id, title, subtitle, topic, published_date", { count: "exact" })
         .lte("published_date", today)
         .order("published_date", { ascending: false })
         .order("id", { ascending: false })
@@ -107,6 +107,21 @@ export const getPublishedArticleIndex = unstable_cache(
     }
     return articles;
   },
-  ["published-article-index-v1"],
+  ["published-article-index-v2"],
   cacheOptions
 );
+
+// Optional editorial mood tags. A pre-migration database still serves readings.
+export const getMoodReadings = unstable_cache(async (today: string) => {
+  const index = await getPublishedArticleIndex(today);
+  const tags: Record<number, string[]> = {};
+  for (let offset = 0; offset < index.length; offset += 200) {
+    const { data, error } = await supabase.from("articles").select("id, moods").in("id", index.slice(offset, offset + 200).map(a => a.id)).lte("published_date", today);
+    if (error) {
+      if (error.code === "42703" || error.code === "PGRST204") break;
+      throw new Error("Unable to load reading suggestions");
+    }
+    for (const row of data || []) if (Array.isArray(row.moods)) tags[row.id] = row.moods;
+  }
+  return index.map(article => ({ ...article, moods: tags[article.id] ?? null }));
+}, ["mood-readings-v1"], cacheOptions);

@@ -1,5 +1,6 @@
+import { readReminderSchedule } from "@/lib/reminder-schedule";
 import { NextRequest } from "next/server";
-import { dailyQuote, isQuoteOrigin, QUOTE_UTC_HOUR, quoteDay, quotePayload } from "@/lib/quote-reminders";
+import { dailyQuote, isQuoteOrigin, quoteDay, quotePayload } from "@/lib/quote-reminders";
 import { getActiveQuotes } from "@/lib/catalog";
 import { endpointHash, getPushSettings, quoteDatabase, quoteJson, quoteReader, quoteReply, rememberQuoteReader, sendEncryptedQuote, validCurveSubscription } from "@/lib/quote-reminder-server";
 import { invalidateReminderCount } from "@/lib/reading-counts-server";
@@ -13,12 +14,16 @@ export async function GET(request: NextRequest) {
   if (!settings) return quoteReply({ ready: false });
   const reader = quoteReader(request, settings);
   let enabled: boolean | null = null;
+  let localTime: string | undefined, timeZone: string | undefined;
   if (reader.existing) {
-    const { data, error } = await quoteDatabase(settings).from("quote_reminder_subscriptions").select("enabled, vapid_public_key").eq("browser_hash", reader.hash).maybeSingle();
+    const { data, error } = await quoteDatabase(settings).from("quote_reminder_subscriptions").select("enabled, vapid_public_key, reminder_time, time_zone").eq("browser_hash", reader.hash).maybeSingle();
     if (error) return quoteReply({ error: "Reminders are unavailable right now. Please try again later." }, 503);
+    localTime = data?.reminder_time?.slice(0, 5); timeZone = data?.time_zone;
     enabled = data ? data.enabled && data.vapid_public_key === settings.publicKey : false;
   }
-  return rememberQuoteReader(quoteReply({ ready: true, publicKey: settings.publicKey, utcHour: QUOTE_UTC_HOUR, enabled }), reader.token);
+  const status = await quoteDatabase(settings).rpc("reminder_scheduler_status");
+  if (status.error) return quoteReply({ ready: false });
+  return rememberQuoteReader(quoteReply({ ready: true, publicKey: settings.publicKey, enabled, localTime, timeZone, scheduleReady: status.data === true }), reader.token);
 }
 
 export async function POST(request: NextRequest) {
@@ -29,6 +34,8 @@ export async function POST(request: NextRequest) {
   if (!input || typeof input !== "object" || Array.isArray(input)) return quoteReply({ error: "Invalid request." }, 400);
   const body = input as Record<string, unknown>;
   if (typeof body.action !== "string" || !["subscribe", "disable", "test"].includes(body.action)) return quoteReply({ error: "Invalid request." }, 400);
+  const schedule = readReminderSchedule(body);
+  if (body.action === "subscribe" && !schedule) return quoteReply({ error: "Choose a valid reminder time and time zone." }, 400);
   const subscription = body.subscription ? validCurveSubscription(body.subscription) : null;
   if (body.action === "subscribe" && !subscription) return quoteReply({ error: "This browser’s push service could not be registered. Please try a supported browser." }, 400);
   const settings = getPushSettings();
@@ -40,7 +47,7 @@ export async function POST(request: NextRequest) {
     const rate = await database.rpc("limit_quote_requests", { p_browser_hash: reader.hash, p_network_hash: reader.network, p_action: body.action });
     if (rate.error) return quoteReply({ error: rate.error.code === "PT429" ? "Please wait a while before trying again." : "Reminders are unavailable right now." }, rate.error.code === "PT429" ? 429 : 503);
     if (body.action === "subscribe" && subscription) {
-      const { error } = await database.rpc("save_quote_subscription", { p_browser_hash: reader.hash, p_endpoint_hash: endpointHash(subscription.endpoint), p_endpoint: subscription.endpoint, p_p256dh: subscription.keys.p256dh, p_auth: subscription.keys.auth, p_vapid_public_key: settings.publicKey });
+      const { error } = await database.rpc("save_scheduled_quote_subscription", { p_browser_hash: reader.hash, p_endpoint_hash: endpointHash(subscription.endpoint), p_endpoint: subscription.endpoint, p_p256dh: subscription.keys.p256dh, p_auth: subscription.keys.auth, p_vapid_public_key: settings.publicKey, p_reminder_time: schedule!.localTime, p_time_zone: schedule!.timeZone });
       if (error) return quoteReply({ error: "Your reminder could not be enabled. Please try again." }, 503);
     } else if (body.action === "disable") {
       const { error } = await database.rpc("disable_quote_subscription", { p_browser_hash: reader.hash, p_endpoint_hash: subscription ? endpointHash(subscription.endpoint) : null, p_p256dh: subscription?.keys.p256dh || null, p_auth: subscription?.keys.auth || null });

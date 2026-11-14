@@ -17,7 +17,7 @@ export default function HomeQuoteCarousel({ quotes, initialQuoteId = null }: { q
 
     const timer = window.setInterval(() => {
       setCurrentIndex((current) => (current + 1) % quotes.length);
-    }, 3000);
+    }, 6000);
 
     return () => window.clearInterval(timer);
   }, [quotes.length, paused]);

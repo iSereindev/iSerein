@@ -1,3 +1,4 @@
+import TopicPainting from "@/app/TopicPainting";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import { Suspense } from "react";
@@ -5,6 +6,7 @@ import { getTopicTheme } from "@/lib/reading-theme";
 import HomeReading, { HomeReadingSkeleton } from "./HomeReading";
 import HomeThoughts from "./HomeThoughts";
 import { InstallEntryLink } from "./InstallApp";
+import HomeMoodFinder from "./HomeMoodFinder";
 
 export const dynamic = "force-dynamic";
 
@@ -95,9 +97,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
               <Link
                 key={topic.name}
                 href={"/topics/" + topic.name}
-                className="iserein-home-topic"
+                className="iserein-home-topic iserein-painted-topic"
                 style={{ backgroundColor: theme.soft }}
               >
+                <TopicPainting topic={topic.name} />
                 <div className="iserein-home-topic-top">
                   <span
                     className="iserein-home-topic-number"
@@ -114,6 +117,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
           })}
         </div>
       </section>
+
+      <div className="iserein-home-container"><Suspense fallback={null}><HomeMoodFinder /></Suspense></div>
 
       <Suspense fallback={null}>
         <HomeThoughts thoughtId={thoughtId} />

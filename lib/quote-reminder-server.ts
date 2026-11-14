@@ -83,7 +83,7 @@ export async function sendEncryptedQuote(subscription: QuoteSubscription, payloa
   try {
     const details = webpush.generateRequestDetails(subscription, JSON.stringify(payload), {
       vapidDetails: { subject: `${SITE_URL}/about`, publicKey: settings.publicKey, privateKey: settings.privateKey },
-      contentEncoding: "aes128gcm", TTL: payload.test ? 300 : 43200, urgency: "normal", topic: payload.test ? "iserein-quote-test" : "iserein-daily-quote",
+      contentEncoding: "aes128gcm", TTL: payload.test ? 300 : 1800, urgency: "normal", topic: payload.test ? "iserein-quote-test" : "iserein-daily-quote",
     });
     const headers = Object.fromEntries(Object.entries(details.headers).map(([key, value]) => [key, String(value)]));
     const response = await fetch(details.endpoint, { method: "POST", headers, body: Uint8Array.from(details.body), redirect: "error", signal: AbortSignal.timeout(4500), cache: "no-store" });
@@ -94,18 +94,23 @@ export async function sendEncryptedQuote(subscription: QuoteSubscription, payloa
 
 export async function runDailyQuotes(settings: PushSettings, day: string, hop = 0) {
   if (day !== quoteDay()) return;
-  const quote = dailyQuote(await getActiveQuotes(), day);
-  if (!quote) { console.info("Daily quotes: no active quote; skipped."); return; }
-  const payload = quotePayload(quote, day);
   const database = quoteDatabase(settings);
+  const heartbeat = await database.rpc("record_reminder_tick");
+  if (heartbeat.error) throw new Error("Reminder schedule migration is required");
+  const quotes = await getActiveQuotes();
+  if (!quotes.length) { console.info("Daily quotes: no active quote; skipped."); return; }
   const summary = await dispatchQuoteBatch({
     day, publicKey: settings.publicKey, budgetMs: 20000,
-    claim: async (date, key, limit) => {
-      const { data, error } = await database.rpc("claim_quote_deliveries", { p_day: date, p_vapid_public_key: key, p_limit: limit });
+    claim: async (_date, key, limit) => {
+      const { data, error } = await database.rpc("claim_due_quote_deliveries", { p_vapid_public_key: key, p_limit: limit });
       if (error) throw new Error("Could not claim daily quote deliveries");
       return (data || []) as QuoteDeliveryRow[];
     },
-    send: row => sendEncryptedQuote({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, payload, settings),
+    send: row => {
+      const localDay = row.local_day || day;
+      const quote = dailyQuote(quotes, localDay);
+      return quote ? sendEncryptedQuote({ endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } }, quotePayload(quote, localDay), settings) : Promise.resolve("failed");
+    },
     finish: async results => {
       const { error } = await database.rpc("finish_quote_deliveries", { p_results: results });
       if (error) throw new Error("Could not record daily quote delivery results");
@@ -115,7 +120,7 @@ export async function runDailyQuotes(settings: PushSettings, day: string, hop = 
       if (process.env.VERCEL_ENV !== "production") throw new Error("Remaining quote deliveries need another local invocation");
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
-          const result = await fetch(`${SITE_URL}/api/cron/daily-quote?day=${day}&hop=${hop + 1}`, { method: "POST", headers: { Authorization: `Bearer ${settings.cronSecret}` }, redirect: "error", signal: AbortSignal.timeout(5000), cache: "no-store" });
+          const result = await fetch(`${SITE_URL}/api/cron/daily-quote?day=${quoteDay()}&hop=${hop + 1}`, { method: "POST", headers: { Authorization: `Bearer ${settings.cronSecret}` }, redirect: "error", signal: AbortSignal.timeout(5000), cache: "no-store" });
           await result.body?.cancel();
           if (result.ok) return;
         } catch { /* A lost acknowledgment is safe: daily claims prevent another send. */ }

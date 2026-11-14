@@ -1367,3 +1367,34 @@ h3 {
     transition: none;
   }
 }
+
+/* Topic paintings remain decorative; cream-backed text stays readable. */
+.iserein-painted-topic {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.iserein-topic-painting {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: url("/images/topics/paintings.webp");
+  background-size: 300% auto;
+  background-repeat: no-repeat;
+}
+.iserein-painted-topic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgb(246 240 232 / 84%) 0%, rgb(246 240 232 / 10%) 34%, rgb(246 240 232 / 90%) 74%, #f6f0e8 100%);
+}
+.iserein-home-topic.iserein-painted-topic {
+  min-height: 270px;
+}
+.iserein-home-topic.iserein-painted-topic h3 {
+  margin-top: auto;
+  padding-top: 85px;
+}

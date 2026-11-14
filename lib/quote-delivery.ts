@@ -1,5 +1,5 @@
 export type QuoteDeliveryRow = {
-  id: number; endpoint: string; p256dh: string; auth: string; claim_token: string;
+  id: number; endpoint: string; p256dh: string; auth: string; claim_token: string; local_day?: string;
 };
 export type QuoteDeliveryResult = { id: number; claim_token: string; status: "sent" | "expired" | "failed" };
 

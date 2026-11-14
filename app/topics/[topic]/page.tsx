@@ -1,3 +1,5 @@
+import ReadingEnd from "@/app/ReadingEnd";
+import ReadingDirectory from "@/app/ReadingDirectory";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
@@ -5,7 +7,7 @@ import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import ReadingViews from "@/app/ReadingViews";
 import { notFound } from "next/navigation";
-import { getPublishedArticle, getPublishedArticleIndex } from "@/lib/articles";
+import { getPublishedArticle, getPublishedArticleIndex, getLatestPublishedArticle } from "@/lib/articles";
 import { getPublicationDate } from "@/lib/publication";
 import { readingText } from "@/lib/reading-text";
 import { getTopicName, topicDescriptions } from "@/lib/topics";
@@ -39,12 +41,14 @@ export default async function TopicPage({ params, searchParams }: {
   const seed = typeof shuffle === "string" && /^[0-9a-f]{32}$/i.test(shuffle)
     ? shuffle : randomUUID().replaceAll("-", "");
   const published = await getPublishedArticleIndex(today, topic);
-  const ids = shuffleArticleOrder(published, `${topic}:${seed}`).map(({ id }) => id);
+  const latest = await getLatestPublishedArticle(today);
+  const isShuffled = typeof shuffle === "string" && /^[0-9a-f]{32}$/i.test(shuffle);
+  const ids = (isShuffled ? shuffleArticleOrder(published, `${topic}:${seed}`) : published).map(({ id }) => id);
   const position = topicDeckPosition(ids, reading, page);
-  const selected = ids[position] ? await getPublishedArticle(String(ids[position]), today) : null;
+  const selected = (reading || page) && ids[position] ? await getPublishedArticle(String(ids[position]), today) : null;
   // Never display a reading that moved to another topic while the index was cached.
   const article = selected?.topic === topic ? selected : null;
-  const href = (index: number) => topicReadingHref(topic, ids[index], seed);
+  const href = (index: number) => isShuffled ? topicReadingHref(topic, ids[index], seed) : `/topics/${topic}?reading=${ids[index]}#topic-reading`;
 
   return (
     <main className="iserein-topic-page min-h-screen bg-[#F6F0E8] text-[#33241D]" style={{
@@ -72,6 +76,8 @@ export default async function TopicPage({ params, searchParams }: {
 
       <section className="px-6 pb-16 pt-5 md:pb-24 md:pt-8" aria-label={`${topic} reading collection`}>
         <div className="mx-auto max-w-4xl">
+          <ReadingDirectory articles={published} topic={topic} currentId={article?.id} />
+          <div id="topic-reading" className="scroll-mt-8" />
           {article ? (
             <ReadingStack
               articleId={article.id}
@@ -102,13 +108,14 @@ export default async function TopicPage({ params, searchParams }: {
                   <ReadingContent content={article.content || ""} />
                 </section>
                 <ArticleFeedback key={article.id} articleId={article.id} />
+                <ReadingEnd key={article.id} articleId={article.id} isToday={latest?.id === article.id} />
                 <div className="iserein-stack-ending">
                   <p>Read slowly. Stay awhile.</p>
                   <Link href={`/reading/${article.id}`} className="text-sm text-[#805334] underline underline-offset-4">Open this reading <span aria-hidden="true">↗</span></Link>
                 </div>
               </article>
             </ReadingStack>
-          ) : (
+          ) : published.length ? null : (
             <div className="rounded-[2rem] bg-[#FFFDF9] px-6 py-16 text-center shadow-[0_12px_40px_rgba(51,36,29,0.065)]">
               <h2 className="font-serif text-3xl font-normal">No readings here yet.</h2>
               <p className="mx-auto mt-5 max-w-lg leading-7 text-[#75665C]">New pages for this topic will appear here as they are published.</p>

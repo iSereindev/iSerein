@@ -1,3 +1,4 @@
+import TopicPainting from "@/app/TopicPainting";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import { getTopicTheme } from "@/lib/reading-theme";
@@ -81,9 +82,10 @@ export default function TopicsPage() {
               className="group flex flex-col overflow-hidden rounded-[1.75rem] border border-[#33241D]/10 bg-[#FFFDF9] shadow-[0_8px_28px_rgba(51,36,29,0.045)] transition-shadow hover:shadow-[0_14px_36px_rgba(51,36,29,0.09)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#8C5F42]"
             >
               <div
-                className="relative flex min-h-[190px] flex-col justify-between p-8 text-[#33241D]"
+                className="iserein-painted-topic relative flex min-h-[250px] flex-col justify-between overflow-hidden p-8 text-[#33241D]"
                 style={{ backgroundColor: topic.theme.surface }}
               >
+                <TopicPainting topic={topic.name} />
                 <div
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-3 rounded-[1.1rem] border border-[#33241D]/15"
