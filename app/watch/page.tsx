@@ -1,3 +1,4 @@
+import ExploreNavigation from "@/app/ExploreNavigation";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import YouTubeSubscribeLink from "@/app/YouTubeSubscribeLink";
@@ -32,6 +33,7 @@ export default async function WatchPage({
           <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">Short films</span>
         </div>
       </header>
+      <ExploreNavigation watch />
 
       <section className="px-6 pb-8 pt-8 md:px-10 md:pb-12 md:pt-16">
         <div className="mx-auto max-w-7xl">

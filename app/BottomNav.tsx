@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { label: "Home", href: "/", icon: "home" },
+  { label: "Today", href: "/", icon: "home" },
   { label: "Topics", href: "/topics", icon: "topics" },
-  { label: "Watch", href: "/watch", icon: "watch" },
   { label: "Explore", href: "/explore", icon: "explore" },
-  { label: "Saved", href: "/profile", icon: "saved" },
+  { label: "Discussions", href: "/discussions", icon: "discussions" },
+  { label: "Profile", href: "/profile", icon: "profile" },
 ] as const;
 
 type IconName = (typeof tabs)[number]["icon"];
@@ -49,15 +49,14 @@ function NavIcon({ name }: { name: IconName }) {
         </>
       )}
 
-      {name === "watch" && (
+      {name === "discussions" && (
         <>
-          <rect x="4" y="2" width="16" height="20" rx="4" />
-          <path d="m10 8 6 4-6 4V8Z" />
+          <path d="M21 11a9 9 0 0 1-9 9H4l-3 2 2-7a9 9 0 1 1 18-4Z" />
         </>
       )}
 
-      {name === "saved" && (
-        <path d="M6 3h12v18l-6-4-6 4V3Z" />
+      {name === "profile" && (
+        <><circle cx="12" cy="7" r="4" /><path d="M4 22v-3a8 8 0 0 1 16 0v3Z" /></>
       )}
     </svg>
   );
@@ -73,7 +72,7 @@ export default function BottomNav() {
           const isActive =
             tab.href === "/"
               ? pathname === "/"
-              : pathname === tab.href ||
+              : (tab.href === "/explore" && pathname === "/watch") || pathname === tab.href ||
                 pathname.startsWith(`${tab.href}/`);
 
           return (

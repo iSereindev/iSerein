@@ -1,3 +1,4 @@
+import Discussion from "@/app/community/Discussion";
 import ReadingEnding from "@/app/ReadingEnding";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -163,6 +164,7 @@ export default async function ReadingPage({
             </section>
 
             <ArticleFeedback key={article.id} articleId={article.id} />
+                <Discussion key={article.id} articleId={article.id} />
 
             <ReadingEnding key={article.id} articleId={article.id} isToday={article.published_date === today} today={today} />
 

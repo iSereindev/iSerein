@@ -14,7 +14,7 @@ function Thumb({ down = false }: { down?: boolean }) {
   </svg>;
 }
 
-export default function ArticleFeedback({ articleId }: { articleId: number }) {
+export default function ArticleFeedback({ articleId, privateFeedback = false }: { articleId: number; privateFeedback?: boolean }) {
   const id = useId();
   const storageKey = `iserein-article-feedback:${articleId}`;
   const snapshot = useCallback(() => {
@@ -80,6 +80,7 @@ export default function ArticleFeedback({ articleId }: { articleId: number }) {
         <button type="button" aria-pressed={current.reaction === "up"} aria-label="Thumbs up: this reading spoke to me" disabled={busy} className={`${button} ${current.reaction === "up" ? "border-[#5B3A2D] bg-[#5B3A2D] text-[#FFF9F0]" : "border-[#5B3A2D]/25 bg-transparent text-[#5B3A2D] hover:bg-[#F6EFE7]"}`} onClick={() => { if (current.reaction !== "up") void send("reaction", "up"); }}><Thumb />Yes</button>
         <button type="button" aria-pressed={current.reaction === "down"} aria-label="Thumbs down: this reading did not quite speak to me" disabled={busy} className={`${button} ${current.reaction === "down" ? "border-[#5B3A2D] bg-[#5B3A2D] text-[#FFF9F0]" : "border-[#5B3A2D]/25 bg-transparent text-[#5B3A2D] hover:bg-[#F6EFE7]"}`} onClick={() => { if (current.reaction !== "down") void send("reaction", "down"); }}><Thumb down />Not quite</button>
       </div>
+      {privateFeedback && <>
       <button type="button" aria-expanded={open} aria-controls={`${id}-form`} className="mt-5 min-h-11 text-sm text-[#5B3A2D] underline decoration-[#5B3A2D]/30 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#5B3A2D]" onClick={() => setOpen(value => !value)}>{open ? "Close message" : current.commented ? "Update your feedback" : "Share a thought"}</button>
       {open && <form id={`${id}-form`} onSubmit={submit} className="mt-4 text-left">
         <label htmlFor={`${id}-message`} className="text-sm text-[#5B3A2D]">What stayed with you, or what could be better?</label>
@@ -90,6 +91,7 @@ export default function ArticleFeedback({ articleId }: { articleId: number }) {
           <button type="submit" disabled={busy || !message.trim()} className={`${button} border-[#5B3A2D] bg-[#5B3A2D] text-[#FFF9F0] disabled:cursor-default`}>{busy ? "Sending…" : "Send privately"}</button>
         </div>
       </form>}
+      </>}
       <p role="status" aria-live="polite" className="mt-2 text-sm leading-6 text-[#75665C]">{status}</p>
       {error && <p role="alert" className="mt-2 text-sm leading-6 text-[#8C3D2B]">{error}</p>}
     </section>

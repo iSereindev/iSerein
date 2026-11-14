@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AccountPanel from "@/app/community/AccountPanel";
 import BrandLogo from "@/app/BrandLogo";
 import { getTopicTheme } from "@/lib/reading-theme";
 import { useEffect, useState } from "react";
@@ -217,7 +218,7 @@ export default function ProfilePage() {
           </Link>
 
           <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">
-            Saved
+            Profile
           </span>
         </div>
       </header>
@@ -234,9 +235,10 @@ export default function ProfilePage() {
           </div>
 
           <h1 className="mt-7 font-serif text-5xl font-normal tracking-tight md:text-7xl">
-            Saved
+            Profile
           </h1>
 
+          <AccountPanel />
           <p className="mt-6 max-w-xl font-serif text-2xl leading-9">
             The pages and books you keep close.
           </p>

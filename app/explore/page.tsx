@@ -1,3 +1,4 @@
+import ExploreNavigation from "@/app/ExploreNavigation";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
 import { getActiveBooks } from "@/lib/catalog";
@@ -30,6 +31,7 @@ export default async function ExplorePage() {
           </span>
         </div>
       </header>
+      <ExploreNavigation />
 
       {/* INTRODUCTION */}
       <section className="px-6 pb-10 pt-14 md:px-10 md:pb-14 md:pt-24">

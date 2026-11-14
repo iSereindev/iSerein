@@ -1,3 +1,4 @@
+import Discussion from "@/app/community/Discussion";
 import TopicPainting from "@/app/TopicPainting";
 import ReadingEnding from "@/app/ReadingEnding";
 import TopicReadingDirectory from "@/app/TopicReadingDirectory";
@@ -108,6 +109,7 @@ export default async function TopicPage({ params, searchParams }: {
                   <ReadingContent content={article.content || ""} />
                 </section>
                 <ArticleFeedback key={article.id} articleId={article.id} />
+                <Discussion key={article.id} articleId={article.id} />
                 <ReadingEnding key={article.id} articleId={article.id} isToday={article.published_date === today} today={today} />
 
               </article>

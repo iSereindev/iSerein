@@ -54,10 +54,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <InstallProvider>
+          {process.env.NEXT_PUBLIC_LOCAL_DISCUSSIONS === "true" && <p className="bg-[#5B3A2D] px-4 py-2 text-center text-xs text-[#FFF9F0]">Local discussion preview · sample readings · updates stay in My conversations</p>}
           <div className="iserein-page-content">{children}</div>
           <BottomNav />
         </InstallProvider>
-        <Analytics />
+        {process.env.NEXT_PUBLIC_LOCAL_DISCUSSIONS !== "true" && <Analytics />}
       </body>
     </html>
   );

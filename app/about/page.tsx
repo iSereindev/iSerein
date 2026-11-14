@@ -37,8 +37,8 @@ export default function AboutPage() {
         </section>
 
         <section className="iserein-about-contact" aria-labelledby="contact-heading">
-          <h2 id="contact-heading">Get in touch.</h2>
-          <p>For feedback, questions, or reading suggestions:</p>
+          <h2 id="contact-heading">Send private feedback.</h2>
+          <p>For private feedback, questions, or reading suggestions. Your message is not posted in discussions:</p>
           <a href="mailto:isereindev@gmail.com" className="iserein-about-email">
             isereindev@gmail.com <span aria-hidden="true">↗</span>
           </a>
