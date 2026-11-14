@@ -1,3 +1,4 @@
+import { READING_REMINDER_NAME } from "@/lib/reminder-labels";
 import TopicPainting from "@/app/TopicPainting";
 import Link from "next/link";
 import BrandLogo from "@/app/BrandLogo";
@@ -130,7 +131,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
           <Link href="/about" className="iserein-home-text-link">
             About &amp; Contact
           </Link>
-          <Link href="/install#quote-reminders" className="iserein-home-text-link">Reading reminders</Link>
+          <Link href="/install#quote-reminders" className="iserein-home-text-link">{READING_REMINDER_NAME}</Link>
           <span className="iserein-footer-brand">iSEREIN</span>
         </div>
       </footer>

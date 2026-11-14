@@ -1,4 +1,6 @@
 "use client";
+import { READING_REMINDER_NAME } from "@/lib/reminder-labels";
+
 
 import Link from "next/link";
 import { embeddedBrowser, installDevice, type InstallDevice } from "@/lib/install-environment";
@@ -126,7 +128,7 @@ export function InstallEntryLink() {
       href={installed ? "/install#quote-reminders" : "/install"}
       className={"iserein-primary iserein-home-install iserein-install-entry" + (installed ? "" : " iserein-install-link")}
     >
-      {installed ? "Reading reminders" : device === "ios" ? "Add to Home Screen" : "Install iSEREIN"}
+      {installed ? READING_REMINDER_NAME : device === "ios" ? "Add to Home Screen" : "Install iSEREIN"}
       <span aria-hidden="true">{installed ? " →" : " ↓"}</span>
     </Link>
   );

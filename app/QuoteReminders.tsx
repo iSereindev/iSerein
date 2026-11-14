@@ -1,4 +1,6 @@
 "use client";
+import { READING_REMINDER_NAME } from "@/lib/reminder-labels";
+
 import useReminderReadSync from "./useReminderReadSync";
 
 import Link from "next/link";
@@ -187,7 +189,7 @@ export default function QuoteReminders({ label, openOnHash, inlineInstallHelp = 
       await request("disable", signal, localSubscription.current);
       checkOperation(signal);
       setConfig({ ...config, enabled: false }); setHasLocal(false); setPhase("ready");
-      setMessage("Daily reminders are off on this device.");
+      setMessage(`${READING_REMINDER_NAME} are off on this device.`);
       // The retained browser subscription can be reused if the reader opts in again.
     });
   }
@@ -210,13 +212,13 @@ export default function QuoteReminders({ label, openOnHash, inlineInstallHelp = 
   const manageable = phase === "on" || phase === "ready";
   return <div className="mt-4 text-left">
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      {phase === "on" ? <span role="status" className="text-sm text-[#5B3A2D]">✓ Daily reading reminders on</span>
+      {phase === "on" ? <span role="status" className="text-sm text-[#5B3A2D]">✓ {READING_REMINDER_NAME} on</span>
         : <button type="button" disabled={busy || phase === "loading"} onClick={() => phase === "ready" ? enable() : setOpen(true)}
-          className={button}>{busy ? "Connecting…" : phase === "loading" ? "Checking reminders…" : "Remind me to read"}</button>}
+          className={button}>{busy ? "Connecting…" : phase === "loading" ? "Checking reminders…" : READING_REMINDER_NAME}</button>}
       {phase !== "on" && <span className="text-xs text-[#75665C]">{label || "9 AM · based on this device’s read history"}</span>}
       <button type="button" aria-expanded={open} aria-controls={`${id}-panel`} className="min-h-11 text-xs text-[#75665C] underline underline-offset-4" onClick={() => setOpen(value => !value)}>{open ? "Close" : phase === "on" ? "Manage" : "Options"}</button>
     </div>
-    {open && <section id={`${id}-panel`} aria-label="Reminder settings" className="mt-2 max-w-xl rounded-xl border border-[#5B3A2D]/15 p-4">
+    {open && <section id={`${id}-panel`} aria-label={READING_REMINDER_NAME} className="mt-2 max-w-xl rounded-xl border border-[#5B3A2D]/15 p-4">
       {manageable && <>
         <p className="text-sm leading-6 text-[#75665C]">Around 9 AM · {timeZone.replaceAll("_", " ")}. New readings first; otherwise, an unread page. All caught up? No notification.</p>
         <p className="mt-2 text-xs leading-5 text-[#75665C]">Completed-reading IDs sync privately for this device. No account needed.</p>
