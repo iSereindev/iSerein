@@ -1,6 +1,6 @@
 import TopicPainting from "@/app/TopicPainting";
 import ReadingEnd from "@/app/ReadingEnd";
-import ReadingDirectory from "@/app/ReadingDirectory";
+import TopicReadingDirectory from "@/app/TopicReadingDirectory";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
@@ -76,7 +76,7 @@ export default async function TopicPage({ params, searchParams }: {
 
       <section className="px-6 pb-16 pt-5 md:pb-24 md:pt-8" aria-label={`${topic} reading collection`}>
         <div className="mx-auto max-w-4xl">
-          <ReadingDirectory articles={published} topic={topic} currentId={article?.id} />
+          <TopicReadingDirectory articles={published} topic={topic} currentId={article?.id} />
           <div id="topic-reading" className="scroll-mt-8" />
           {article ? (
             <ReadingStack
