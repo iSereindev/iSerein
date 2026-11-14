@@ -130,7 +130,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ t
           <Link href="/about" className="iserein-home-text-link">
             About &amp; Contact
           </Link>
-          <Link href="/install#quote-reminders" className="iserein-home-text-link">Quote reminders</Link>
+          <Link href="/install#quote-reminders" className="iserein-home-text-link">Reading reminders</Link>
           <span className="iserein-footer-brand">iSEREIN</span>
         </div>
       </footer>

@@ -47,8 +47,8 @@ export default function InstallPage() {
         </section>
 
         <section id="quote-reminders" className="iserein-install-notes" aria-labelledby="quote-reminders-heading">
-          <h2 id="quote-reminders-heading" className="font-serif text-2xl text-[#33241D]">Daily quote reminders.</h2>
-          <p>Choose one quote a day on this device. You can turn reminders off here at any time.</p>
+          <h2 id="quote-reminders-heading" className="font-serif text-2xl text-[#33241D]">Daily reading reminders.</h2>
+          <p>A new reading or an unread page, around 9 AM your time. Turn reminders off whenever you like.</p>
           <QuoteReminders label="Manage daily reminders" openOnHash="#quote-reminders" inlineInstallHelp={false} />
         </section>
 
