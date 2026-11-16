@@ -224,7 +224,7 @@ export default function ProfilePage() {
       </header>
 
       {/* INTRODUCTION */}
-      <section className="px-6 pb-10 pt-14 md:px-10 md:pb-14 md:pt-24">
+      <section className="px-6 pb-6 pt-8 md:px-10 md:pb-8 md:pt-10">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center gap-4">
             <span className="h-px w-10 shrink-0 bg-[#A7784D]" />
@@ -374,12 +374,13 @@ export default function ProfilePage() {
                 )}
 
                 {selected === "readings" ? (
-                  <div className="grid gap-7 md:grid-cols-2">
+                  <div className="space-y-3">
                     {readings.items.map((article) => (
-                      <article
-                        key={article.id}
-                        className="flex flex-col overflow-hidden rounded-[1.75rem] border border-[#33241D]/10 bg-[#FFFDF9] shadow-[0_8px_28px_rgba(51,36,29,0.045)]"
-                      >
+                      <details key={article.id} className="overflow-hidden rounded-2xl border border-[#33241D]/15 bg-[#FFFDF9]">
+        <summary className="cursor-pointer px-5 py-4 text-[#33241D] focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#5B3A2D]">
+          <span className="ml-2 font-serif text-xl">{article.title}</span>
+          <span className="mt-1 block pl-6 text-xs text-[#75665C]">{article.topic}</span>
+        </summary>
                         <div
                           className="h-1.5"
                           style={{
@@ -430,16 +431,17 @@ export default function ProfilePage() {
                             <SaveButton articleId={article.id} />
                           </div>
                         </div>
-                      </article>
+                      </details>
                     ))}
                   </div>
                 ) : (
-                  <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">
+                  <div className="space-y-3">
                     {books.items.map((book) => (
-                      <article
-                        key={book.id}
-                        className="flex flex-col overflow-hidden rounded-[1.75rem] border border-[#33241D]/10 bg-[#FFFDF9] shadow-[0_8px_28px_rgba(51,36,29,0.045)]"
-                      >
+                      <details key={book.id} className="overflow-hidden rounded-2xl border border-[#33241D]/15 bg-[#FFFDF9]">
+        <summary className="cursor-pointer px-5 py-4 text-[#33241D] focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#5B3A2D]">
+          <span className="ml-2 font-serif text-xl">{book.title}</span>
+          <span className="mt-1 block pl-6 text-xs text-[#75665C]">{book.author}</span>
+        </summary>
                         <div className="flex min-h-[300px] items-center justify-center bg-[#E9DFD4] px-8 py-8">
                           {book.cover_url ? (
                             // eslint-disable-next-line @next/next/no-img-element
@@ -525,7 +527,7 @@ export default function ProfilePage() {
                             </p>
                           </div>
                         </div>
-                      </article>
+                      </details>
                     ))}
                   </div>
                 )}

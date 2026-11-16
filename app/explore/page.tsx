@@ -27,14 +27,14 @@ export default async function ExplorePage() {
           </Link>
 
           <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">
-            The bookshelf
+            Explore
           </span>
         </div>
       </header>
       <ExploreNavigation />
 
       {/* INTRODUCTION */}
-      <section className="px-6 pb-10 pt-14 md:px-10 md:pb-14 md:pt-24">
+      <section className="px-6 pb-6 pt-8 md:px-10 md:pb-8 md:pt-10">
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center gap-4">
             <span className="h-px w-10 shrink-0 bg-[#A7784D]" />
@@ -49,15 +49,11 @@ export default async function ExplorePage() {
           </h1>
 
           <p className="mt-6 max-w-2xl font-serif text-2xl leading-9 text-[#33241D] md:text-3xl md:leading-10">
-            Some pages stay with you.
-            <br />
-            Some become whole books.
+            Read a little. Watch a little.
           </p>
 
           <p className="mt-6 max-w-xl text-base leading-8 text-[#75665C]">
-            A small collection of books selected for the iSEREIN
-            bookshelf. Discover ideas to deepen your understanding of
-            yourself, your life, and who you are becoming.
+            Discover selected books, videos and podcast shorts for your self, life and growth.
           </p>
 
           <div className="mt-8 max-w-2xl rounded-2xl border border-[#8C5F42]/20 bg-[#FFFDF9] px-5 py-4">
@@ -88,15 +84,16 @@ export default async function ExplorePage() {
           </div>
 
           {books.length > 0 ? (
-            <div className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-3">
               {books.map((book) => {
                 const style = getTopicTheme(book.topic);
 
                 return (
-                  <article
-                    key={book.id}
-                    className="flex flex-col overflow-hidden rounded-[1.75rem] border border-[#33241D]/10 bg-[#FFFDF9] shadow-[0_8px_28px_rgba(51,36,29,0.045)]"
-                  >
+                  <details key={book.id} className="overflow-hidden rounded-2xl border border-[#33241D]/15 bg-[#FFFDF9]">
+        <summary className="cursor-pointer px-5 py-4 text-[#33241D] focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-[#5B3A2D]">
+          <span className="ml-2 font-serif text-xl">{book.title}</span>
+          <span className="mt-1 block pl-6 text-xs text-[#75665C]">{book.author}</span>
+        </summary>
                     {/* BOOK COVER */}
                     <div
                       className="flex min-h-[340px] items-center justify-center px-8 py-10"
@@ -194,7 +191,7 @@ export default async function ExplorePage() {
                         </p>
                       </div>
                     </div>
-                  </article>
+                  </details>
                 );
               })}
             </div>

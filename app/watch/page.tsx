@@ -30,7 +30,7 @@ export default async function WatchPage({
       <header className="border-b border-[#33241D]/10">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-6 md:px-10">
           <Link href="/" className="iserein-brand text-xl"><BrandLogo /></Link>
-          <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">Short films</span>
+          <span className="text-xs uppercase tracking-[0.2em] text-[#75665C]">Videos &amp; podcast shorts</span>
         </div>
       </header>
       <ExploreNavigation watch />
@@ -39,7 +39,7 @@ export default async function WatchPage({
         <div className="mx-auto max-w-7xl">
           <h1 className="font-serif text-5xl font-normal tracking-tight md:text-7xl">Watch</h1>
           <p className="mt-4 max-w-xl font-serif text-lg leading-8 text-[#75665C] md:text-xl">
-            Short videos for a different perspective.
+            Videos and podcast shorts for a different perspective.
           </p>
           <YouTubeSubscribeLink className="mt-6" />
         </div>
@@ -55,7 +55,7 @@ export default async function WatchPage({
                 {requested > 1 ? "No videos on this page." : "A new perspective is on its way."}
               </h2>
               <p className="mt-4 leading-7 text-[#75665C]">
-                {requested > 1 ? "Return to the latest videos." : "Our first short films will appear here soon."}
+                {requested > 1 ? "Return to the latest videos." : "Videos and podcast shorts will appear here soon."}
               </p>
               <Link href={requested > 1 ? "/watch" : "/topics"} className="iserein-primary mt-6 rounded-full px-6 py-3 text-sm">
                 {requested > 1 ? "Latest videos" : "Explore the readings"} <span aria-hidden="true">→</span>
