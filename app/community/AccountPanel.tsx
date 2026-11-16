@@ -22,6 +22,13 @@ export default function AccountPanel() {
     <h2 className="font-serif text-2xl">{profile ? profile.name : "Join the conversation"}</h2>
     {loading ? <p role="status" className="mt-3 text-sm">Checking your account…</p> : user ? <>
       <p className="mt-2 text-sm text-[#75665C]">Signed in as {user.email}. Your email is private.</p>
+      <div data-profile-topics className="mt-4">
+        <p className="text-sm text-[#75665C]">Find your next reading.</p>
+        <Link href="/topics"
+          className="iserein-primary mt-3 inline-flex min-h-11 items-center rounded-full px-5 py-3 text-sm">
+          View topics →
+        </Link>
+      </div>
       <form className="mt-4 flex flex-wrap gap-3" onSubmit={e => { e.preventDefault(); void run(async () => {
         await communityRpc("community_profile", { p_name: name.trim() }); setMessage("Display name saved.");
       }); }}>
