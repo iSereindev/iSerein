@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import ReplyEmailPreference from "./ReplyEmailPreference";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useCommunityAccount from "./useCommunityAccount";
 import { communityRpc, COMMUNITY_BUTTON as button, COMMUNITY_CHANGE, type Thread, type DiscussionComment } from "@/lib/community-client";
@@ -127,6 +128,7 @@ export default function Discussion({ articleId }: { articleId: number }) {
           await communityRpc("community_action",{p_action:follow?"follow":"unfollow",p_id:articleId});
         }); }} /> Show updates in My conversations
       </label>}
+            {profile && <ReplyEmailPreference key={`${articleId}:${user?.id}`} articleId={articleId} />}
             <Link href="/community-guidelines" className="flex min-h-11 items-center underline">Community guidelines</Link>
           </div>
         </details>

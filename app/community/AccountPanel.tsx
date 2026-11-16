@@ -35,6 +35,9 @@ export default function AccountPanel() {
       </form>
       {profile?.moderator && <Link href="/moderation" className="mt-4 inline-block text-sm underline">Manage discussions →</Link>}
       <details className="mt-5 text-sm"><summary className="cursor-pointer">Account settings</summary>
+        <button type="button" disabled={busy} className={`${button} my-3`} onClick={() => void run(async () => {
+          await communityRpc("community_email_disable_all"); setMessage("All discussion reply emails are off. Daily reading reminders are unchanged.");
+        })}>Turn off all reply emails</button>
         <p className="my-3">Deleting your account removes your comments, reactions, and discussion updates. Saved items on this device remain.</p>
         {!deleting ? <button type="button" className={button} onClick={() => setDeleting(true)}>Delete account…</button> :
           <div><label>Type DELETE to confirm<input className="my-2 block rounded border p-2" value={confirmation} onChange={e => setConfirmation(e.target.value)} /></label>
