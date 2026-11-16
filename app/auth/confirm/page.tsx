@@ -12,7 +12,7 @@ export default function ConfirmPage() {
       // Stored locally by the composer; never trust an arbitrary redirect URL.
       let target: string | null = null;
       try { target = localStorage.getItem("iserein-discussion-return"); localStorage.removeItem("iserein-discussion-return"); } catch { /* A blocked store must not block sign-in. */ }
-      window.location.replace(target && /^\/reading\/[1-9]\d*#discussion$/.test(target) ? target : "/profile#account");
+      window.location.replace(target && /^\/(?:reading|watch)\/[1-9]\d*#discussion$/.test(target) ? target : "/profile#account");
     }).catch(() => { if (alive) setMessage("Sign-in could not be confirmed. Please try again."); });
     return () => { alive = false; };
   }, []);

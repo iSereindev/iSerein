@@ -1,4 +1,5 @@
 import "server-only";
+import { discussionHref } from "./discussion-target";
 import { createClient } from "@supabase/supabase-js";
 
 export function discussionEmailDatabase() {
@@ -45,7 +46,7 @@ export async function sendDiscussionEmails() {
       if (result.error) throw new Error("Could not record skipped email.");
       continue;
     }
-    const reading = `${settings.site}/reading/${job.article_id}#discussion`;
+    const reading = `${settings.site}${discussionHref(job.article_id)}`;
     const unsubscribe = `${settings.site}/api/discussion-emails/unsubscribe?token=${encodeURIComponent(job.token)}`;
     let outcome: "sent" | "failed" | "uncertain" | "retry" = "uncertain";
     try {
@@ -58,7 +59,7 @@ export async function sendDiscussionEmails() {
           subject: "A new reply in your iSEREIN discussion",
           headers: { idempotencyKey: job.id },
           tags: ["discussion-replies"],
-          htmlContent: `<html><body style="background:#F6F0E8;color:#33241D;font-family:Georgia,serif;padding:24px"><div style="max-width:560px;margin:auto"><p>iSEREIN</p><h1 style="font-size:26px">The conversation continues.</h1><p>There are new replies in the discussion for <strong>${escapeEmail(job.title)}</strong>.</p><p><a href="${reading}">Read the conversation →</a></p><p style="font-size:13px">You asked for reply emails for this article. <a href="${unsubscribe}">Stop emails for this discussion</a>, or turn all reply emails off in <a href="${settings.site}/profile#account">Profile</a>.</p><p style="font-size:13px">To reply publicly, use the discussion link above. Replies to this email reach iSEREIN privately.</p></div></body></html>`,
+          htmlContent: `<html><body style="background:#F6F0E8;color:#33241D;font-family:Georgia,serif;padding:24px"><div style="max-width:560px;margin:auto"><p>iSEREIN</p><h1 style="font-size:26px">The conversation continues.</h1><p>There are new replies in the discussion for <strong>${escapeEmail(job.title)}</strong>.</p><p><a href="${reading}">Read the conversation →</a></p><p style="font-size:13px">You asked for reply emails for this discussion. <a href="${unsubscribe}">Stop emails for this discussion</a>, or turn all reply emails off in <a href="${settings.site}/profile#account">Profile</a>.</p><p style="font-size:13px">To reply publicly, use the discussion link above. Replies to this email reach iSEREIN privately.</p></div></body></html>`,
           textContent: `iSEREIN\n\nThe conversation continues.\nNew replies in: ${job.title}\n\nRead the conversation: ${reading}\n\nStop emails for this discussion: ${unsubscribe}\nTurn all reply emails off in Profile: ${settings.site}/profile#account\n\nTo reply publicly, open the discussion. Replies to this email reach iSEREIN privately.`,
         }),
       });

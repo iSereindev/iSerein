@@ -37,3 +37,17 @@ export const getPublishedVideos = unstable_cache(
   ["published-videos-v1"],
   { revalidate: 60, tags: ["videos"] }
 );
+
+export const getPublishedVideo = unstable_cache(
+  async (id: number, today: string): Promise<WatchVideo | null> => {
+    const { data, error } = await supabase.from("videos")
+      .select("id, title, caption, youtube_url").eq("id", id)
+      .eq("active", true).lte("published_date", today).maybeSingle();
+    if (error) throw new Error("Unable to load video.");
+    if (!data) return null;
+    const youtubeId = youtubeVideoId(data.youtube_url);
+    return youtubeId ? { id: data.id, title: data.title, caption: data.caption, youtubeId } : null;
+  },
+  ["published-video-v1"],
+  { revalidate: 60, tags: ["videos"] }
+);

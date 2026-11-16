@@ -6,7 +6,7 @@ await db.exec(`create role anon;create role authenticated;create role service_ro
 create table auth.users(id uuid primary key,email_confirmed_at timestamptz,email text);
 create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
 grant usage on schema auth to anon,authenticated;grant execute on function auth.uid() to anon,authenticated;`);
-for(const name of ['20261114000100_local_catalog.sql','20261114000200_discussions.sql','20261115000100_reply_emails.sql']) await db.exec(await readFile(new URL('supabase/migrations/'+name,root),'utf8'));
+for(const name of ['20261114000100_local_catalog.sql','20261114000200_discussions.sql','20261115000100_reply_emails.sql','20261117000100_video_discussions.sql']) await db.exec(await readFile(new URL('supabase/migrations/'+name,root),'utf8'));
 const alice='00000000-0000-4000-8000-000000000001',bob='00000000-0000-4000-8000-000000000002';
 await db.query('insert into auth.users values($1,now(),$2),($3,now(),$4)',[alice,'alice@example.test',bob,'bob@example.test']);
 const as=async(u,role='authenticated')=>{await db.exec('reset role');await db.query("select set_config('request.jwt.claim.sub',$1,false)",[u||'']);await db.exec('set role '+role);};

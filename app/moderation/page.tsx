@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { discussionHref } from "@/lib/discussion-target";
 import { useCallback, useEffect, useState } from "react";
 import useCommunityAccount from "@/app/community/useCommunityAccount";
 import { communityRpc, COMMUNITY_BUTTON as button } from "@/lib/community-client";
@@ -17,12 +18,12 @@ export default function ModerationPage(){
  try{await communityRpc("community_moderate",{p_action:action,p_id:id,p_user:user,p_flag:flag});await load();setMessage("Updated.");}catch(e){setMessage(e instanceof Error?e.message:"Please try again.");}finally{setBusy(false);}}
  return <main className="min-h-screen bg-[#F6F0E8] px-6 py-12 text-[#33241D]"><div className="mx-auto max-w-3xl"><Link href="/profile">← Profile</Link><h1 className="my-8 font-serif text-4xl">Discussion moderation</h1>
  {loading?<p>Checking access…</p>:!profile?.moderator?<p>Moderator access is required.</p>:<>
- <p className="mb-4 text-sm">Reports are private. You can also hide comments and close threads directly beneath an article.</p>
+ <p className="mb-4 text-sm">Reports are private. You can also hide comments and close threads directly beneath an article or video.</p>
  <button className={button} onClick={()=>void load()}>Refresh reports</button>
  {!reports.length&&<p className="my-6">No open reports.</p>}
  {reports.map(r=><article className="my-5 rounded-xl border border-[#33241D]/20 p-5" key={r.id}>
  <p className="text-sm">{r.name||"Former reader"} · {r.hidden?"Hidden":"Visible"}</p><p className="my-3 whitespace-pre-wrap">{r.body}</p><p className="my-3 text-sm">Report: {r.reason}</p>
- <div className="flex flex-wrap gap-2"><Link className={button} href={`/reading/${r.article_id}#discussion`}>Open discussion</Link>
+ <div className="flex flex-wrap gap-2"><Link className={button} href={discussionHref(r.article_id)}>Open discussion</Link>
  <button disabled={busy} className={button} onClick={()=>void act("hide",r.comment_id,null,!r.hidden)}>{r.hidden?"Restore":"Hide"} comment</button>
  {r.reported_user&&<button disabled={busy} className={button} onClick={()=>{if(window.confirm("Restrict this reader from posting?"))void act("block",null,r.reported_user);}}>Restrict reader</button>}
  <button disabled={busy} className={button} onClick={()=>void act("resolve",r.id)}>Resolve report</button></div></article>)}

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { discussionHref, discussionElementId } from "@/lib/discussion-target";
 import ReplyEmailPreference from "./ReplyEmailPreference";
 import { useCallback, useEffect, useRef, useState } from "react";
 import useCommunityAccount from "./useCommunityAccount";
@@ -20,6 +21,7 @@ export default function Discussion({ articleId }: { articleId: number }) {
   const [reason, setReason] = useState("");
   const [remove, setRemove] = useState<number | null>(null);
   const generation = useRef(0);
+  const elementId = discussionElementId(articleId);
   const draftKey = `iserein-discussion-draft:${articleId}`;
   const refresh = useCallback(async () => {
     const current = ++generation.current;
@@ -40,12 +42,12 @@ export default function Discussion({ articleId }: { articleId: number }) {
       if (typeof draft?.body === "string") { setBody(draft.body.slice(0,2000)); if (draft.body) setComposerOpen(true); }
       if (draft?.parent && Number.isSafeInteger(draft.parent.id)) setParent(draft.parent);
     } catch { /* Invalid or unavailable local drafts do not block discussion. */ }
-    const fromLink = () => { if (window.location.hash === "#discussion") setOpen(true); };
+    const fromLink = () => { if ((window.location.hash === `#${elementId}` || (window.location.hash === "#discussion" && window.location.pathname === discussionHref(articleId).split("#")[0]))) setOpen(true); };
     fromLink(); });
-    const fromLink = () => { if (window.location.hash === "#discussion") setOpen(true); };
+    const fromLink = () => { if ((window.location.hash === `#${elementId}` || (window.location.hash === "#discussion" && window.location.pathname === discussionHref(articleId).split("#")[0]))) setOpen(true); };
     window.addEventListener("hashchange", fromLink);
     return () => { cancelAnimationFrame(frame); window.removeEventListener("hashchange", fromLink); };
-  }, [draftKey]);
+  }, [draftKey, articleId, elementId]);
   const saveDraft = (text: string, reply = parent) => {
     setBody(text);
     if (!edit) try { localStorage.setItem(draftKey, JSON.stringify({ body: text, parent: reply })); } catch { /* Keep in-memory text. */ }
@@ -58,7 +60,7 @@ export default function Discussion({ articleId }: { articleId: number }) {
     finally { setBusy(false); }
   }
   function signIn() {
-    try { localStorage.setItem("iserein-discussion-return", `/reading/${articleId}#discussion`); } catch { /* Sign-in remains usable. */ }
+    try { localStorage.setItem("iserein-discussion-return", discussionHref(articleId)); } catch { /* Sign-in remains usable. */ }
   }
   function focusComposer() {
     setComposerOpen(true);
@@ -109,7 +111,7 @@ export default function Discussion({ articleId }: { articleId: number }) {
         </form>}
       </li>;
   }
-  return <details id="discussion" open={open} onToggle={event => setOpen(event.currentTarget.open)} className="font-sans mx-auto mt-6 max-w-2xl scroll-mt-6 border-t border-[#33241D]/15 pt-3 text-[#33241D]">
+  return <details id={elementId} open={open} onToggle={event => setOpen(event.currentTarget.open)} className="font-sans mx-auto mt-6 max-w-2xl scroll-mt-6 border-t border-[#33241D]/15 pt-3 text-[#33241D]">
     <summary className="cursor-pointer py-3 text-sm font-medium">Discussion{thread ? ` · ${thread.count}` : ""}</summary>
     {message && <p role="status" className="my-3 text-sm">{message}</p>}
     {!thread && <button type="button" className={button} onClick={() => void refresh()}>Retry loading</button>}

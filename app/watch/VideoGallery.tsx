@@ -1,5 +1,6 @@
 "use client";
 
+import Discussion from "@/app/community/Discussion";
 import { useEffect, useRef, useState } from "react";
 import type { WatchVideo } from "@/lib/videos";
 
@@ -20,7 +21,7 @@ export default function VideoGallery({ videos }: { videos: WatchVideo[] }) {
   }, [activeId]);
 
   return (
-    <div className="iserein-watch-grid">
+    <div className="iserein-watch-grid" style={videos.length === 1 ? { gridTemplateColumns: "minmax(0, 1fr)" } : undefined}>
       {videos.map((video) => {
         const active = activeId === video.id;
         return (
@@ -83,6 +84,7 @@ export default function VideoGallery({ videos }: { videos: WatchVideo[] }) {
                 </button>
               )}
             </div>
+            <div className="px-4 pb-4"><Discussion articleId={-video.id} /></div>
           </article>
         );
       })}
